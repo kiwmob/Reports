@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equity Strategy — 지역별 콜</title>
+<style>
+  :root{
+    --brand:#0a2240;
+    --brand-deep:#06182e;
+    --accent:#5c1a26;
+    --accent2:#7a2c3a;
+    --paper:#f4f6f9;
+    --card:#ffffff;
+    --ink:#1b1e24;
+    --ink-soft:#525866;
+    --line:#dde3ec;
+    --buy:#1f7a4d;
+    --bear:#c0392b;
+    --bull:#1f6fb2;
+    --warn:#8a4b15;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Helvetica Neue','Pretendard','Noto Sans KR',Arial,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased;}
+  .topbar{background:var(--brand-deep);color:#fff;padding:14px 6vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:3px solid var(--accent);position:sticky;top:0;z-index:50;}
+  .topbar .logo{font-weight:700;font-size:18px;letter-spacing:0.5px;}
+  .topbar .logo span{color:#c9a0a8;}
+  .topbar nav{display:flex;gap:8px;flex-wrap:wrap;}
+  .topbar nav a{color:#cfd8e6;text-decoration:none;font-size:12.5px;padding:6px 12px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;transition:all .15s;}
+  .topbar nav a:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 6vw 90px;}
+  .intro{border-left:4px solid var(--accent);padding:8px 0 8px 20px;margin-bottom:48px;}
+  .intro .eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent2);font-weight:700;}
+  .intro h1{font-size:26px;margin:8px 0 6px;color:var(--brand);}
+  .report{margin-bottom:64px;scroll-margin-top:70px;}
+  .report-head{background:linear-gradient(135deg,var(--brand) 0%, var(--brand-deep) 100%);color:#fff;border-radius:10px 10px 0 0;padding:28px 30px;}
+  .report-head .tag{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9fb4d4;font-weight:700;}
+  .report-head h2{margin:8px 0 14px;font-size:23px;line-height:1.35;}
+  .report-head .lede{font-family:'Georgia',serif;font-size:15.5px;color:#e3ebf6;border-top:1px solid rgba(255,255,255,0.16);padding-top:14px;margin:0;}
+  .report-body{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;padding:30px;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;}
+  .chip{border:1px solid var(--line);border-radius:8px;padding:10px 16px;background:#fafbfd;flex:1;min-width:130px;}
+  .chip .k{font-size:10.5px;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink-soft);}
+  .chip .v{font-size:19px;font-weight:700;color:var(--brand);margin-top:2px;}
+  .chip .v.buy{color:var(--buy);}
+  .chip .v.sell{color:var(--bear);}
+  .chip .s{font-size:11px;color:var(--ink-soft);}
+  h3.sec{font-size:17px;color:var(--brand);margin:30px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;gap:10px;scroll-margin-top:70px;}
+  h3.sec .n{background:var(--brand);color:#fff;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  h4.sub{font-size:14px;color:var(--accent2);margin:18px 0 8px;}
+  ul.pts{margin:0;padding:0;list-style:none;}
+  ul.pts li{position:relative;padding:7px 0 7px 20px;font-size:14.5px;border-bottom:1px dashed var(--line);}
+  ul.pts li:last-child{border-bottom:none;}
+  ul.pts li::before{content:"—";position:absolute;left:0;color:var(--accent2);font-weight:700;}
+  ul.pts b{color:var(--brand);}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 4px;}
+  table.tbl th{background:var(--brand);color:#fff;text-align:left;padding:8px 10px;font-weight:600;}
+  table.tbl th.num{text-align:right;}
+  table.tbl td{padding:7px 10px;border-bottom:1px solid var(--line);}
+  table.tbl tr:nth-child(even) td{background:#f7f9fc;}
+  table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  table.tbl td.buy{color:var(--buy);font-weight:700;}
+  table.tbl td.sell{color:var(--bear);font-weight:700;}
+  table.tbl tr.hl td{background:#eef2f8 !important;font-weight:700;}
+  table.tbl.small{font-size:12px;}
+  table.tbl.small td,table.tbl.small th{padding:5px 8px;}
+  .tbl-wrap{overflow-x:auto;}
+  .tbl-src{font-size:10.5px;color:#9aa3b2;margin:4px 0 10px;}
+  .chart-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px 22px 14px;margin:14px 0;}
+  .chart-card .ct{font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;}
+  .chart-src{font-size:10.5px;color:#9aa3b2;margin-top:8px;}
+  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:11px;height:11px;border-radius:2px;display:inline-block;}
+  .bbgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0;}
+  @media(max-width:680px){.bbgrid{grid-template-columns:1fr;}}
+  .bb{border-radius:8px;padding:16px;border:1px solid var(--line);background:#fafbfd;}
+  .bb.bull{border-top:3px solid var(--bull);}
+  .bb.base{border-top:3px solid var(--ink-soft);}
+  .bb.bear{border-top:3px solid var(--bear);}
+  .bb .lbl{font-size:11px;letter-spacing:0.6px;text-transform:uppercase;font-weight:700;color:var(--ink-soft);}
+  .bb .px{font-size:17px;font-weight:700;color:var(--brand);margin:4px 0;}
+  .bb ul{margin:8px 0 0;padding-left:16px;font-size:12px;color:var(--ink-soft);}
+  .bb li{margin-bottom:4px;}
+  .callout{background:#fbf6ec;border:1px solid #e8dcc3;border-radius:8px;padding:14px 18px;font-size:13px;color:var(--ink-soft);margin-top:14px;}
+  .callout .t{font-size:10.5px;font-weight:700;letter-spacing:0.6px;color:var(--warn);text-transform:uppercase;display:block;margin-bottom:5px;}
+  .risk-box{background:var(--brand);color:#dde6f3;border-radius:8px;padding:22px 24px;margin-top:14px;}
+  .risk-box h4{margin:0 0 10px;color:#fff;font-size:14.5px;}
+  .risk-box ul{margin:0;padding-left:18px;}
+  .risk-box li{margin-bottom:8px;font-size:13px;}
+  .risk-box li b{color:#fff;}
+  footer{border-top:1px solid var(--line);margin-top:50px;padding-top:20px;font-size:11px;color:#9aa3b2;line-height:1.6;}
+  @media(max-width:560px){.intro h1{font-size:21px;}.report-head h2{font-size:19px;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Research<span>·</span>Digest</div>
+  <nav>
+    <a href="#s1">시장 콜</a>
+    <a href="#s2">금리·인플레</a>
+    <a href="#s3">非미국 vs 미국</a>
+    <a href="#s4">EM vs DM</a>
+    <a href="#s5">핵심 콜</a>
+    <a href="#s6">매크로 전망</a>
+    <a href="#s7">Top Picks</a>
+    <a href="#s8">데이터</a>
+    <a href="#risk">리스크</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <div class="intro">
+    <div class="eyebrow">07 September 2026</div>
+    <h1>Equity Strategy — 지역별 콜: 非미국 주식 YTD 우위, EM vs DM 트레이드 재가동</h1>
+  </div>
+
+  <section class="report" id="rpt1">
+    <div class="report-head">
+      <div class="tag">Global Markets Strategy / Equity Strategy</div>
+      <h2>非미국 주식이 2년 연속 미국을 앞서고 있으며, EM vs DM 트레이드가 다시 작동 중 — 조정 시 매수(buy the dips) 유지</h2>
+      <p class="lede">전 지역 EPS 상향, 4년 최고 수준의 ISM·유로존 PMI 등 견조한 활동 모멘텀이 지속되는 한 금리 상승과 완만한 긴축은 강세 시각을 훼손하지 못하며, 이익 격차 축소·시장 breadth 확대·달러 고점 가능성이 非미국 및 EM 우위를 뒷받침한다.</p>
+    </div>
+
+    <div class="report-body">
+
+      <div class="chips">
+        <div class="chip"><div class="k">Global Equities</div><div class="v buy">Bullish</div><div class="s">MSCI AC World YTD +15% (TR, USD) / 연말까지 추가 상승 전망</div></div>
+        <div class="chip"><div class="k">AC World ex US vs US</div><div class="v">+4%</div><div class="s">YTD TR USD / 2025년 +15%</div></div>
+        <div class="chip"><div class="k">EM vs DM</div><div class="v buy">OW · +11%</div><div class="s">YTD TR / 연중 고점 +20%, 2025년 +13%</div></div>
+        <div class="chip"><div class="k">EM 12m Fwd P/E</div><div class="v">10x</div><div class="s">DM 약 18x 대비 45% 할인 (기록적 저점)</div></div>
+        <div class="chip"><div class="k">Asset Class</div><div class="v">Equities OW</div><div class="s">주식 65% / 채권 30% / 현금 5%</div></div>
+      </div>
+
+      <h3 class="sec" id="s1"><span class="n">1</span>전체 시장 콜: 견조한 활동 모멘텀이 핵심 동인, 조정은 매수 기회</h3>
+      <ul class="pts">
+        <li>주간 EPS revisions가 계속 개선되어 <b>모든 주요 지역에서 net positive</b> 전환 (MSCI Eurozone, S&amp;P500, Topix, MSCI EM). Q1·Q2 실적 시즌 모두 건전한 이익 성장을 기록했고, Q2의 핵심은 <b>섹터 전반으로의 이익 확산(broadening)</b>.</li>
+        <li>활동 지표 호조: <b>US ISM 제조업 및 유로존 제조업 PMI가 4년 최고치 부근</b>. 유로존 PMI는 이란 분쟁으로 인한 하락을 되돌리며 3개월 연속 상승, 유로존 CESI(경기 서프라이즈 지수)는 수년래 최고치로 급등. 글로벌 composite PMI 52.0, 유로존 제조업 PMI 51.4.</li>
+        <li>기업 신뢰 개선이 非테크 활동 회복으로 이어지는 중 — 글로벌(ex-China) 非테크 제조업 생산 및 <b>미국 非테크 capex/structures</b> 반등이 가시화.</li>
+        <li>글로벌 주식은 지정학 리스크·인플레 우려·채권 매도세에도 <b>사상 최고치 부근</b> 유지. Brent는 미국-이란 간 보복 타격 격화로 <b>지난주 +7%</b>.</li>
+        <li>최근 글로벌 채권 매도세는 Warsh 의장의 잭슨홀 발언 등 매파적 중앙은행 시그널, 이란 군사행동 재개, 예상 상회 고용지표, 재정 지속가능성 우려 및 회사채 공급 증가가 결합된 결과. <b>US 10Y 4.78%(9/3)</b>로 수년래 고점 — 이에 따라 상당한 조정을 우려하는 시각이 여전히 많음.</li>
+        <li>리포트의 결론: 지정학 리스크와 인플레·금리 역풍이 더 커질 수 있음은 인정하나, <b>기업이익이 상승 추세에 있는 한 주가 약세는 밸류에이션을 더 싸게 만들 뿐</b> — 조정 시 매수(using the dips to add) 지속. 3월 후반 이후 일관되게 이란 분쟁발 약세를 매수 기회로 활용할 것을 주장해 왔으며, derisking 국면에 동참하면 우호적 헤드라인에 whipsaw될 위험이 있다는 시각.</li>
+        <li>지수 레벨에서는 2H 신고가 갱신을 전망했고 <b>추가 상승</b>을 콜. Low Vol 그룹(Staples·Utilities 등)은 상대 성과가 다시 저점으로, 유럽에서는 지난 1개월간 모든 Defensive 섹터가 성과 하위 절반에 위치. Cyclical 섹터의 EPS 모멘텀이 가속 중이며 <b>Mining·Banks·Capital Goods의 랠리 지속, Semis의 안정화</b>를 예상.</li>
+      </ul>
+
+      <h3 class="sec" id="s2"><span class="n">2</span>금리 상승·완만한 긴축이 강세 시각을 훼손하지 못하는 이유 — 2022년과의 차이</h3>
+      <ul class="pts">
+        <li>핵심 조건은 <b>인플레 기대의 de-anchoring 여부</b>. 인플레 압력의 대부분은 단기 유가 움직임에 연동되어 있으며, 유가가 현 수준을 유지하더라도 미국·유로존 headline CPI는 유가 기저효과 소멸로 <b>전기 대비 하락</b>을 시작할 전망. 많은 인플레 지표가 이미 정점을 지나는 중.</li>
+        <li>Warsh 의장이 <b>PCE 물가지수를 Fed의 주요 준거로 유지</b>한다고 확인한 점은 Fed 신뢰성에 대한 기존 의구심을 완화.</li>
+        <li><b>임금 배경이 2022년과 정반대</b>: 2022년 진입 당시 Atlanta Fed Wage Growth Tracker는 6% 이상에서 여전히 상승 중이었고, 코로나 공급 병목·노동 공급 감소와 결합해 지속적 인플레와 공격적 긴축을 초래. 현재는 임금 상승률이 수 분기째 하락해 <b>4%에 근접</b>. 지난 금요일 고용지표는 견조한 채용과 함께 <b>시간당 임금 yoy 상승률이 코로나 이후 최저</b>를 기록.</li>
+        <li>Term premia는 지난 수년간 상승했으나 이제 <b>대체로 정상화</b>. 실질금리는 상승 중이나 최근 수년 범위 내에 있으며, 상승 폭은 2022년보다 현저히 작음.</li>
+        <li>역사적으로 <b>US 10Y가 5.5% 이상</b>으로 오르면 금리와 주식 밸류에이션의 관계가 크게 제약적으로 변해 멀티플 압축이 가팔라지나, 현재(10Y 4.8%, S&amp;P500 12m Fwd P/E 20x)는 밸류에이션이 감당 가능한 범위.</li>
+        <li>Fed 재가격(repricing)이 달러에 상방 압력을 주지만, <b>Fed는 이미 가격에 반영된 것보다 덜 매파적</b>일 수 있음. NY Fed 총재 Williams와 Waller 이사가 지난주 인플레 관련 낙관적 발언을 한 점은 고무적.</li>
+      </ul>
+      <div class="callout"><span class="t">비교 포인트</span>2022년은 임금 가속 + 공급 병목 → 지속 인플레 → 대규모 긴축 → 연중 주가 하락의 연쇄였으나, 현재는 임금 둔화·정상화된 term premia·유가 연동형 인플레 구조로 완만한 긴축이 주식 상승을 막지 못한다는 것이 리포트의 핵심 논리.</div>
+
+      <h3 class="sec" id="s3"><span class="n">3</span>非미국 vs 미국: 2년 연속 아웃퍼폼 가능성</h3>
+      <ul class="pts">
+        <li>2025년 MSCI AC World ex US는 미국 대비 <b>+15% 이상(TR, USD)</b> 우위. 이란 분쟁의 초기 확전이 Q2 미국 상대 성과를 끌어올렸음에도 <b>2026년 YTD 다시 +4% 우위</b>.</li>
+        <li>연말까지 시장 참여 확산이 이어지고 이란 분쟁이 극적으로 재확산되지 않는다면, <b>非미국 주식이 2년 연속 미국을 앞서며 마감</b>할 수 있다는 시각.</li>
+        <li><b>지역 간 이익 격차 축소</b>: 지난 3년간 미국 이익이 RoW를 앞섰으나 올해 스프레드가 역전. 2026년 EPS 성장률 컨센서스는 <b>MSCI AC World ex US +36% y/y vs 미국 +32% y/y</b>. RoW 경기 회복도 격차 축소에 기여.</li>
+        <li><b>실질 GDP 격차도 International에 유리</b>: 2026년 글로벌 ex-US 성장률 +2.8% vs 미국 +2.1% 전망 (2027년도 2.8% vs 2.1%).</li>
+        <li><b>시장 breadth 확대</b>가 RoW 우위의 또 다른 동인: 올해 초 3개월 기준 지수를 상회하는 MSCI AC World 종목 비중이 저점에서 <b>약 25%</b>까지 하락해 이례적으로 좁았음. 2H에는 breadding을 전망했으며 AI가 이전만큼 주식 수익률을 지배하지 못할 것으로 판단.</li>
+        <li>고베타·Cyclical 섹터가 아웃퍼폼 중: <b>유럽 Cyclicals vs Defensives YTD +7%, 미국 Cyclicals +10%</b>. 대만 수출주문(6개월 선행)은 유럽 Cyclicals vs Defensives 12m Fwd EPS를 선행하며 의미 있는 상방을 시사.</li>
+        <li>테크는 절대 수준에서는 양호하겠지만 2H 수익률을 주도하지는 않을 전망. <b>Mag-7은 올해 시장 대비 눈에 띄게 언더퍼폼</b> 중.</li>
+        <li><b>USD 시각</b>: 지정학 확전기에 안전자산 역할을 했으나 싸지 않으며 다시 절하될 수 있음. USD net positioning은 +2 stdev 부근으로 <b>stretched</b>. 역사적으로 달러 약세는 주식, 특히 非미국 주식에 우호적.</li>
+      </ul>
+
+      <h4 class="sub">주요 지역 총수익률 (USD, TR)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>지역</th><th class="num">2025</th><th class="num">YTD</th></tr></thead>
+        <tbody>
+          <tr><td>MSCI EM</td><td class="num">34.4%</td><td class="num">24.9%</td></tr>
+          <tr><td>MSCI Japan</td><td class="num">25.1%</td><td class="num">22.4%</td></tr>
+          <tr><td>MSCI AC World ex US</td><td class="num">33.1%</td><td class="num">17.8%</td></tr>
+          <tr><td>MSCI AC World</td><td class="num">22.9%</td><td class="num">15.1%</td></tr>
+          <tr><td>MSCI DM ex US</td><td class="num">32.5%</td><td class="num">14.7%</td></tr>
+          <tr><td>MSCI DM</td><td class="num">21.6%</td><td class="num">13.9%</td></tr>
+          <tr><td>MSCI US</td><td class="num">17.7%</td><td class="num">13.6%</td></tr>
+          <tr><td>MSCI UK</td><td class="num">35.1%</td><td class="num">12.6%</td></tr>
+          <tr><td>MSCI Eurozone</td><td class="num">41.3%</td><td class="num">12.1%</td></tr>
+          <tr><td>MSCI Europe</td><td class="num">36.3%</td><td class="num">11.5%</td></tr>
+          <tr><td>MSCI China</td><td class="num">31.4%</td><td class="num">-8.2%</td></tr>
+          <tr class="hl"><td>MSCI AC World ex US minus US</td><td class="num">15.4%</td><td class="num">4.3%</td></tr>
+          <tr class="hl"><td>EM vs DM</td><td class="num">12.8%</td><td class="num">11.0%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="tbl-src">Source: Datastream</div>
+
+      <div class="chart-card">
+        <div class="ct">MSCI AC World ex US minus US — 연간 EPS 성장률 격차 (%p)</div>
+        <svg viewBox="0 0 880 320" width="100%">
+          <line x1="70" y1="40" x2="850" y2="40" stroke="#eef1f5"/>
+          <line x1="70" y1="80" x2="850" y2="80" stroke="#eef1f5"/>
+          <line x1="70" y1="160" x2="850" y2="160" stroke="#eef1f5"/>
+          <line x1="70" y1="200" x2="850" y2="200" stroke="#eef1f5"/>
+          <line x1="70" y1="240" x2="850" y2="240" stroke="#eef1f5"/>
+          <line x1="70" y1="280" x2="850" y2="280" stroke="#eef1f5"/>
+          <text x="62" y="44" font-size="11" fill="#9aa3b2" text-anchor="end">10%</text>
+          <text x="62" y="84" font-size="11" fill="#9aa3b2" text-anchor="end">5%</text>
+          <text x="62" y="124" font-size="11" fill="#9aa3b2" text-anchor="end">0%</text>
+          <text x="62" y="164" font-size="11" fill="#9aa3b2" text-anchor="end">-5%</text>
+          <text x="62" y="204" font-size="11" fill="#9aa3b2" text-anchor="end">-10%</text>
+          <text x="62" y="244" font-size="11" fill="#9aa3b2" text-anchor="end">-15%</text>
+          <text x="62" y="284" font-size="11" fill="#9aa3b2" text-anchor="end">-20%</text>
+          <line x1="70" y1="120" x2="850" y2="120" stroke="#8a94a6" stroke-width="1.2"/>
+          <!-- bars: 8px per 1%p, zero at y=120 -->
+          <rect x="82.5" y="120" width="40" height="24" fill="#c0392b"/><text x="102.5" y="158" font-size="11" text-anchor="middle" fill="#525866">-3%</text><text x="102.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'15</text>
+          <rect x="147.5" y="112" width="40" height="8" fill="#0a2240"/><text x="167.5" y="106" font-size="11" text-anchor="middle" fill="#525866">1%</text><text x="167.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'16</text>
+          <rect x="212.5" y="64" width="40" height="56" fill="#0a2240"/><text x="232.5" y="58" font-size="11" text-anchor="middle" fill="#525866">7%</text><text x="232.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'17</text>
+          <rect x="277.5" y="120" width="40" height="144" fill="#c0392b"/><text x="297.5" y="278" font-size="11" text-anchor="middle" fill="#525866">-18%</text><text x="297.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'18</text>
+          <rect x="342.5" y="120" width="40" height="24" fill="#c0392b"/><text x="362.5" y="158" font-size="11" text-anchor="middle" fill="#525866">-3%</text><text x="362.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'19</text>
+          <rect x="407.5" y="120" width="40" height="80" fill="#c0392b"/><text x="427.5" y="214" font-size="11" text-anchor="middle" fill="#525866">-10%</text><text x="427.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'20</text>
+          <rect x="472.5" y="88" width="40" height="32" fill="#0a2240"/><text x="492.5" y="82" font-size="11" text-anchor="middle" fill="#525866">4%</text><text x="492.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'21</text>
+          <rect x="537.5" y="64" width="40" height="56" fill="#0a2240"/><text x="557.5" y="58" font-size="11" text-anchor="middle" fill="#525866">7%</text><text x="557.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'22</text>
+          <rect x="602.5" y="120" width="40" height="32" fill="#c0392b"/><text x="622.5" y="166" font-size="11" text-anchor="middle" fill="#525866">-4%</text><text x="622.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'23</text>
+          <rect x="667.5" y="120" width="40" height="24" fill="#c0392b"/><text x="687.5" y="158" font-size="11" text-anchor="middle" fill="#525866">-3%</text><text x="687.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'24</text>
+          <rect x="732.5" y="120" width="40" height="64" fill="#c0392b"/><text x="752.5" y="198" font-size="11" text-anchor="middle" fill="#525866">-8%</text><text x="752.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'25</text>
+          <rect x="797.5" y="88" width="40" height="32" fill="#5c1a26"/><text x="817.5" y="82" font-size="11" text-anchor="middle" fill="#525866">4%</text><text x="817.5" y="300" font-size="11" text-anchor="middle" fill="#525866">'26e</text>
+        </svg>
+        <div class="chart-src">Source: IBES</div>
+      </div>
+
+      <h3 class="sec" id="s4"><span class="n">4</span>EM vs DM: 비중확대(OW) 유지 — 이익·수급·밸류에이션 모두 우호적</h3>
+      <ul class="pts">
+        <li>2018년 이후 EM의 상대 하락 추세와 오랜 신중론 끝에 <b>지난해 EM을 Overweight로 상향</b>했고, 2026년 연간 전망에서 2년 연속 아웃퍼폼을 주장. 메모리 트레이드의 변동성에도 이 시각은 불변.</li>
+        <li>EM vs DM 상대 성과: 연중 최고 시점 <b>+20%</b>, 현재 <b>+11%(TR)</b>로 여전히 의미 있는 수준이며 2025년의 +13%와 큰 차이 없음. 2025년 초 이후 누적으로는 <b>약 17%(USD)</b> 아웃퍼폼. Q1 이란 분쟁과 메모리 트레이드 변동성에도 EM은 6~7월 unwind의 <b>거의 절반을 회복</b>.</li>
+        <li><b>이익 모멘텀</b>: EM vs DM forecast revision index 상승 추세. MSCI EM EPS 성장률 컨센서스 <b>2026년 +72% y/y, 2027년 +23%</b>. MSCI EM 주간 EPS revisions는 outright positive 전환 — 이익 breadth도 개선.</li>
+        <li><b>가벼운 positioning</b>: 지난 1년간 강한 유입에도 EM 비중은 벤치마크를 크게 하회. EM은 MSCI ACWI 시가총액의 <b>약 11%</b>이나 글로벌 AUM에서는 <b>약 6%</b>에 불과 — 구조적 underweight가 투자자의 배분 정상화 과정에서 강력한 순풍.</li>
+        <li><b>자금 흐름</b>: 2025년 EM 주식 순유입 <b>$29.2bn</b>(2021년 이후 최대). 2026년은 Q2 유출에도 이미 <b>약 $75bn</b> 유입으로 더 강하며, 최근 몇 주간 유입이 재개. 연초처럼 유입이 다시 가속될 수 있다는 판단.</li>
+        <li><b>기록적 밸류에이션 할인</b>: 12m Fwd P/E EM 10x vs DM 약 18x → <b>45% 할인</b>, 역사적 중앙값 대비 현저히 넓음. 사이클 단계를 감안해도, 인플레 조정(Shiller P/E) 기준으로도 역사적 중앙값 대비 할인.</li>
+        <li><b>USD·EM FX</b>도 핵심 변수: 달러 약세와 EM 통화 강세는 EM vs DM 시각을 지지.</li>
+        <li><b>Semis 안정화</b>: 2H 진입 시 로테이션·breadth 확대를 콜했으나, 최근에는 <b>momentum unwind가 대체로 마무리</b>됐다고 판단. 테크 derisking은 단기적으로 과도했을 수 있고, 강한 이익 지속이 포지션 재구축을 지지 — 다만 지난여름과 달리 테크가 2H의 명확한 승자가 되지는 않을 전망. Semis 안정화는 EM 트레이드에 상대적으로 우호적. <b>KOSPI는 고점 대비 -39% 조정 후 +18% 반등</b>.</li>
+        <li>EM 전략팀의 최신 노트("Working our way to an attractive setup in Q4")는 단기 역풍이 트레이드 변동성을 유발할 수 있다고 경고하나, 중기적으로 AI capex·도입, 안보/복원력 지출, 균형 잡힌 글로벌 매크로 환경에 힘입어 <b>아시아 주식의 궤적은 우상향</b>. 최근 <b>한국 주식의 큰 손은 기업(자사주 매입)</b>으로, 한국 buybacks는 유례없는 수준에 도달할 전망 (누적 기업 매수 약 $18bn).</li>
+      </ul>
+
+      <div class="chart-card">
+        <div class="ct">MSCI EM relative to DM (USD, 연간 상대 성과)</div>
+        <svg viewBox="0 0 880 320" width="100%">
+          <line x1="70" y1="40" x2="850" y2="40" stroke="#eef1f5"/>
+          <line x1="70" y1="70" x2="850" y2="70" stroke="#eef1f5"/>
+          <line x1="70" y1="100" x2="850" y2="100" stroke="#eef1f5"/>
+          <line x1="70" y1="160" x2="850" y2="160" stroke="#eef1f5"/>
+          <line x1="70" y1="190" x2="850" y2="190" stroke="#eef1f5"/>
+          <line x1="70" y1="220" x2="850" y2="220" stroke="#eef1f5"/>
+          <line x1="70" y1="250" x2="850" y2="250" stroke="#eef1f5"/>
+          <line x1="70" y1="280" x2="850" y2="280" stroke="#eef1f5"/>
+          <text x="62" y="44" font-size="11" fill="#9aa3b2" text-anchor="end">15%</text>
+          <text x="62" y="74" font-size="11" fill="#9aa3b2" text-anchor="end">10%</text>
+          <text x="62" y="104" font-size="11" fill="#9aa3b2" text-anchor="end">5%</text>
+          <text x="62" y="134" font-size="11" fill="#9aa3b2" text-anchor="end">0%</text>
+          <text x="62" y="164" font-size="11" fill="#9aa3b2" text-anchor="end">-5%</text>
+          <text x="62" y="194" font-size="11" fill="#9aa3b2" text-anchor="end">-10%</text>
+          <text x="62" y="224" font-size="11" fill="#9aa3b2" text-anchor="end">-15%</text>
+          <text x="62" y="254" font-size="11" fill="#9aa3b2" text-anchor="end">-20%</text>
+          <text x="62" y="284" font-size="11" fill="#9aa3b2" text-anchor="end">-25%</text>
+          <line x1="70" y1="130" x2="850" y2="130" stroke="#8a94a6" stroke-width="1.2"/>
+          <!-- bars: 6px per 1%, zero at y=130 -->
+          <rect x="85" y="58" width="48" height="72" fill="#0a2240"/><text x="109" y="52" font-size="11" text-anchor="middle" fill="#525866">12%</text><text x="109" y="300" font-size="11" text-anchor="middle" fill="#525866">'17</text>
+          <rect x="163" y="130" width="48" height="42" fill="#c0392b"/><text x="187" y="186" font-size="11" text-anchor="middle" fill="#525866">-7%</text><text x="187" y="300" font-size="11" text-anchor="middle" fill="#525866">'18</text>
+          <rect x="241" y="130" width="48" height="48" fill="#c0392b"/><text x="265" y="192" font-size="11" text-anchor="middle" fill="#525866">-8%</text><text x="265" y="300" font-size="11" text-anchor="middle" fill="#525866">'19</text>
+          <rect x="319" y="118" width="48" height="12" fill="#0a2240"/><text x="343" y="112" font-size="11" text-anchor="middle" fill="#525866">2%</text><text x="343" y="300" font-size="11" text-anchor="middle" fill="#525866">'20</text>
+          <rect x="397" y="130" width="48" height="126" fill="#c0392b"/><text x="421" y="270" font-size="11" text-anchor="middle" fill="#525866">-21%</text><text x="421" y="300" font-size="11" text-anchor="middle" fill="#525866">'21</text>
+          <rect x="475" y="130" width="48" height="24" fill="#c0392b"/><text x="499" y="168" font-size="11" text-anchor="middle" fill="#525866">-4%</text><text x="499" y="300" font-size="11" text-anchor="middle" fill="#525866">'22</text>
+          <rect x="553" y="130" width="48" height="72" fill="#c0392b"/><text x="577" y="216" font-size="11" text-anchor="middle" fill="#525866">-12%</text><text x="577" y="300" font-size="11" text-anchor="middle" fill="#525866">'23</text>
+          <rect x="631" y="130" width="48" height="60" fill="#c0392b"/><text x="655" y="204" font-size="11" text-anchor="middle" fill="#525866">-10%</text><text x="655" y="300" font-size="11" text-anchor="middle" fill="#525866">'24</text>
+          <rect x="709" y="76" width="48" height="54" fill="#0a2240"/><text x="733" y="70" font-size="11" text-anchor="middle" fill="#525866">9%</text><text x="733" y="300" font-size="11" text-anchor="middle" fill="#525866">'25</text>
+          <rect x="787" y="76" width="48" height="54" fill="#5c1a26"/><text x="811" y="70" font-size="11" text-anchor="middle" fill="#525866">9%</text><text x="811" y="300" font-size="11" text-anchor="middle" fill="#525866">'26</text>
+        </svg>
+        <div class="chart-src">Source: Datastream</div>
+      </div>
+
+      <h4 class="sub">연간 누적 EM 주식 자금 유입 (US$bn, 8월 기준)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>연도</th><th class="num">2022</th><th class="num">2023</th><th class="num">2024</th><th class="num">2025</th><th class="num">2026</th></tr></thead>
+        <tbody>
+          <tr><td>8월 누적 유입</td><td class="num sell">-3.9</td><td class="num">3.9</td><td class="num sell">-33.3</td><td class="num">29.2 (연간)</td><td class="num buy">75.5</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="sec" id="s5"><span class="n">5</span>핵심 콜과 드라이버</h3>
+      <h4 class="sub">중기 시각을 좌우하는 요인</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Driver</th><th>Impact</th><th>핵심 가정</th><th>최근 동향</th></tr></thead>
+        <tbody>
+          <tr><td><b>Global Growth</b></td><td>Neutral</td><td>노동시장 hard data가 밝은 부분이나 빠르게 바뀔 수 있음</td><td>글로벌 composite PMI 52.0</td></tr>
+          <tr><td><b>European Growth</b></td><td class="buy">Positive</td><td>재정정책 변화·에너지 인플레가 GDP 전망 상향을 견인</td><td>유로존 제조업 PMI 51.4</td></tr>
+          <tr><td><b>Monetary Policy</b></td><td>Neutral</td><td>Fed 동결</td><td>—</td></tr>
+          <tr><td><b>Currency</b></td><td>Neutral</td><td>장기 달러 약세 시각 유지</td><td>—</td></tr>
+          <tr><td><b>Earnings</b></td><td class="buy">Positive</td><td>2026년 유로존 이익 개선</td><td>2026 EPS 추정치 상향 중</td></tr>
+          <tr><td><b>Valuations</b></td><td class="sell">Negative</td><td>미국 Fwd P/E 21x는 특히 실질금리 대비 여전히 stretched</td><td>MSCI Europe Fwd P/E 14.7x</td></tr>
+          <tr><td><b>Technicals</b></td><td>Neutral</td><td>심리 지표는 과매도 근접, 다만 positioning은 여전히 stretched</td><td>가계 총자산 중 주식 비중 사상 최고</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h4 class="sub">시나리오</h4>
+      <div class="bbgrid">
+        <div class="bb bull"><div class="lbl">🐂 Upside</div><div class="px">Fed 동결 + 성장 상방</div>
+          <ul><li>인플레가 통제된 가운데 Fed 동결</li><li>성장이 예상보다 강함</li></ul></div>
+        <div class="bb base"><div class="lbl">⊕ Base</div><div class="px">성장·인플레 지속 가능</div>
+          <ul><li>경제 성장과 인플레가 지속 가능한 수준 유지</li><li>Fed 정책금리 동결</li><li>지정학 불확실성 완화</li></ul></div>
+        <div class="bb bear"><div class="lbl">🐻 Downside</div><div class="px">Fed 인상 + 확전</div>
+          <ul><li>인플레 재상승으로 Fed 금리 인상</li><li>지정학 불확실성 추가 확대</li></ul></div>
+      </div>
+
+      <h4 class="sub">지역 배분 (글로벌)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>지역</th><th>권고</th><th class="num">MSCI 비중</th><th class="num">배분</th><th class="num">Deviation</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr><td><b>EM</b></td><td class="buy">Overweight</td><td class="num">12.1%</td><td class="num">14.0%</td><td class="num">+1.9%</td><td>underowned, 저평가, 유입 가속, 중국 무역 역풍 완화·정책 지원</td></tr>
+          <tr><td><b>DM</b></td><td class="sell">Underweight</td><td class="num">87.9%</td><td class="num">86.0%</td><td class="num">-1.9%</td><td></td></tr>
+          <tr><td>&nbsp;&nbsp;US</td><td>Neutral</td><td class="num">73.1%</td><td class="num">73.0%</td><td class="num">-0.1%</td><td>혼잡한 positioning, 높은 밸류에이션, AI commoditization 리스크 — 지역 아웃퍼포머 되기 어려움</td></tr>
+          <tr><td>&nbsp;&nbsp;Japan</td><td>Neutral</td><td class="num">5.8%</td><td class="num">6.0%</td><td class="num">+0.2%</td><td>펀더멘털 견조(개혁·buybacks·임금), 다만 큰 랠리 이후 밸류에이션 부담</td></tr>
+          <tr><td>&nbsp;&nbsp;Eurozone</td><td class="buy">Overweight</td><td class="num">8.7%</td><td class="num">11.0%</td><td class="num">+2.3%</td><td>credit impulse 개선, 이익 반등 기대 (분쟁이 2H로 확장되지 않는 경우)</td></tr>
+          <tr><td>&nbsp;&nbsp;UK</td><td>Neutral</td><td class="num">3.6%</td><td class="num">3.0%</td><td class="num">-0.6%</td><td>구조적 저평가·고배당·낮은 AI/무역 민감도로 risk-off에 유용하나 단기 성장 촉매 부재</td></tr>
+          <tr><td>&nbsp;&nbsp;Others</td><td class="sell">Underweight</td><td class="num">8.8%</td><td class="num">7.0%</td><td class="num">-1.8%</td><td>덴마크·스위스·호주·캐나다·홍콩·스웨덴·싱가포르·뉴질랜드·이스라엘·노르웨이</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="tbl-src">Source: MSCI</div>
+
+      <h4 class="sub">유럽 지수 목표치 (Dec '26)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>지수</th><th class="num">목표</th><th class="num">현재</th><th class="num">Upside</th></tr></thead>
+        <tbody>
+          <tr><td>MSCI Eurozone</td><td class="num">420</td><td class="num">386</td><td class="num buy">9%</td></tr>
+          <tr><td>FTSE 100</td><td class="num">11,000</td><td class="num">10,756</td><td class="num">2%</td></tr>
+          <tr><td>MSCI Europe</td><td class="num">2,750</td><td class="num">2,580</td><td class="num">7%</td></tr>
+          <tr><td>Euro STOXX 50</td><td class="num">6,800</td><td class="num">6,362</td><td class="num">7%</td></tr>
+          <tr><td>STOXX 600</td><td class="num">680</td><td class="num">646</td><td class="num">5%</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h4 class="sub">유럽 섹터 콜</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Overweight</th><th>Neutral</th><th>Underweight</th></tr></thead>
+        <tbody>
+          <tr><td class="buy">Mining</td><td>Utilities</td><td class="sell">Energy</td></tr>
+          <tr><td class="buy">Capital Goods</td><td>Healthcare</td><td class="sell">Media</td></tr>
+          <tr><td class="buy">Semis</td><td>Autos</td><td class="sell">Staples</td></tr>
+          <tr><td class="buy">Construction Materials</td><td>Telecoms</td><td class="sell">Insurance</td></tr>
+          <tr><td class="buy">Luxury</td><td>Real Estate</td><td></td></tr>
+          <tr><td></td><td>Chemicals</td><td></td></tr>
+          <tr><td></td><td>Banks</td><td></td></tr>
+          <tr><td></td><td>Technology Hardware</td><td></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <ul class="pts">
+        <li><b>Metals &amp; Mining (OW)</b>: 건설적인 중국 impulse와 달러 약세 배경("spot gap"은 축소)에서 선호. 중국 활동이 핵심 변수.</li>
+        <li><b>Cap Goods (OW)</b>: 건설적인 capex/전력화 전망 — 투자 지출과 연결된 Industrials 부문 선호.</li>
+        <li><b>Semis (OW)</b>: 중국/EM 상승이 기존 중국 노출 Cyclicals·언더퍼포머 회복을 도우며 안정화/수혜 기대.</li>
+        <li><b>Media (UW)</b>: 단기 활동 회복과 무관하게 AI 관련 디스럽션으로 고전 지속 (derating 이후 전술적 반등은 가능).</li>
+        <li><b>Software (UW)</b>: AI 위협으로 유사한 압박, 과매도 구간에서 간헐적 랠리는 있어도 구조적 laggard.</li>
+        <li>유럽 지역 배분: <b>Eurozone OW(58% vs 벤치마크 54.2%)</b>, UK Neutral(21% vs 22.3%), Others UW(21% vs 23.4%). 자산군: <b>주식 OW 65%</b>(벤치마크 60%), 채권 Neutral 30%, 현금 UW 5%.</li>
+      </ul>
+
+      <h3 class="sec" id="s6"><span class="n">6</span>매크로·금리·FX 전망</h3>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>실질 GDP (% oya)</th><th class="num">2025</th><th class="num">2026E</th><th class="num">2027E</th><th class="num">CPI 4Q26</th><th class="num">CPI 2Q27</th></tr></thead>
+        <tbody>
+          <tr><td>United States</td><td class="num">2.1</td><td class="num">2.1</td><td class="num">2.1</td><td class="num">3.7</td><td class="num">2.0</td></tr>
+          <tr><td>Eurozone</td><td class="num">1.3</td><td class="num">0.9</td><td class="num">1.4</td><td class="num">3.4</td><td class="num">2.2</td></tr>
+          <tr><td>United Kingdom</td><td class="num">1.3</td><td class="num">1.2</td><td class="num">1.2</td><td class="num">3.0</td><td class="num">2.7</td></tr>
+          <tr><td>Japan</td><td class="num">1.2</td><td class="num">0.9</td><td class="num">1.1</td><td class="num">2.8</td><td class="num">2.3</td></tr>
+          <tr><td>Emerging Markets</td><td class="num">4.3</td><td class="num">4.1</td><td class="num">3.8</td><td class="num">3.4</td><td class="num">2.8</td></tr>
+          <tr class="hl"><td>Global</td><td class="num">2.8</td><td class="num">2.6</td><td class="num">2.6</td><td class="num">3.4</td><td class="num">2.4</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <h4 class="sub">정책금리 전망</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>국가</th><th class="num">현재</th><th>최근 변경</th><th>다음 변경 예상</th><th class="num">Dec 26</th><th class="num">Jun 27</th></tr></thead>
+        <tbody>
+          <tr><td>US (Fed funds)</td><td class="num">3.75</td><td>10 Dec 25 (-25bp)</td><td>Dec 26 (+25bp)</td><td class="num">4.00</td><td class="num">4.00</td></tr>
+          <tr><td>Eurozone (Depo)</td><td class="num">2.25</td><td>11 Jun 26 (+25bp)</td><td>Sep 26 (+25bp)</td><td class="num">2.50</td><td class="num">2.50</td></tr>
+          <tr><td>UK (Bank Rate)</td><td class="num">3.75</td><td>18 Dec 25 (-25bp)</td><td>Nov 26 (+25bp)</td><td class="num">4.00</td><td class="num">3.75</td></tr>
+          <tr><td>Japan (IOER)</td><td class="num">1.00</td><td>16 Jun 26 (+25bp)</td><td>Sep 26 (+25bp)</td><td class="num">1.50</td><td class="num">1.75</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <h4 class="sub">10Y 국채금리 및 FX 전망 (기말 기준)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>항목</th><th class="num">현재</th><th class="num">Sep 26</th><th class="num">Dec 26</th><th class="num">Mar 27</th><th class="num">Jun 27</th></tr></thead>
+        <tbody>
+          <tr><td>US 10Y (%)</td><td class="num">4.78</td><td class="num">4.80</td><td class="num">4.85</td><td class="num">4.85</td><td class="num">4.85</td></tr>
+          <tr><td>Euro Area 10Y (%)</td><td class="num">3.37</td><td class="num">2.95</td><td class="num">2.90</td><td class="num">2.85</td><td class="num">2.80</td></tr>
+          <tr><td>UK 10Y (%)</td><td class="num">5.20</td><td class="num">2.80</td><td class="num">2.80</td><td class="num">4.75</td><td class="num">4.70</td></tr>
+          <tr><td>Japan 10Y (%)</td><td class="num">2.96</td><td class="num">2.90</td><td class="num">3.05</td><td class="num">3.05</td><td class="num">3.15</td></tr>
+          <tr><td>EUR/USD</td><td class="num">1.16</td><td class="num">1.14</td><td class="num">1.13</td><td class="num">1.12</td><td class="num">1.10</td></tr>
+          <tr><td>GBP/USD</td><td class="num">1.35</td><td class="num">1.31</td><td class="num">1.28</td><td class="num">1.29</td><td class="num">1.28</td></tr>
+          <tr><td>USD/CHF</td><td class="num">0.81</td><td class="num">0.82</td><td class="num">0.84</td><td class="num">0.85</td><td class="num">0.86</td></tr>
+          <tr><td>USD/JPY</td><td class="num">159</td><td class="num">160</td><td class="num">164</td><td class="num">164</td><td class="num">164</td></tr>
+          <tr><td>DXY</td><td class="num">99.6</td><td class="num">101.0</td><td class="num">102.3</td><td class="num">102.9</td><td class="num">104.1</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout"><span class="t">참고</span>10Y 전망표의 UK 항목은 원문 기준 현재 5.20% → Sep/Dec 26 2.80% → Mar 27 4.75%로 표기되어 있어 원문 수치를 그대로 옮겼다. 한편 하우스 FX 전망은 달러 강세(DXY 상승) 경로인 반면 주식 전략 본문은 달러 고점·약세 가능성을 논하고 있어, 두 시각이 병존한다는 점을 유의할 필요.</div>
+
+      <h3 class="sec" id="s7"><span class="n">7</span>Top European Picks</h3>
+      <div class="tbl-wrap">
+      <table class="tbl small">
+        <thead><tr><th>종목</th><th>Ticker</th><th>섹터</th><th class="num">Mcap (€bn)</th><th class="num">EPS 26e</th><th class="num">EPS 27e</th><th class="num">DY 26e</th><th class="num">12m Fwd P/E</th><th class="num">vs 10Y 중앙값</th><th class="num">-12m</th></tr></thead>
+        <tbody>
+          <tr><td>Aegon</td><td>AGN NA</td><td>Financials</td><td class="num">12.4</td><td class="num">22%</td><td class="num">3%</td><td class="num">4.5%</td><td class="num">8.4</td><td class="num">23%</td><td class="num">19%</td></tr>
+          <tr><td>AIB Group</td><td>AIBG ID</td><td>Financials</td><td class="num">23.1</td><td class="num">-5%</td><td class="num">10%</td><td class="num">3.3%</td><td class="num">11.7</td><td class="num">7%</td><td class="num">58%</td></tr>
+          <tr><td>Alstom</td><td>ALO FP</td><td>Industrials</td><td class="num">7.3</td><td class="num">9%</td><td class="num">45%</td><td class="num">1.5%</td><td class="num">8.5</td><td class="num">-48%</td><td class="num">-20%</td></tr>
+          <tr><td>AB InBev</td><td>ABI BB</td><td>Staples</td><td class="num">138.0</td><td class="num">19%</td><td class="num">10%</td><td class="num">1.3%</td><td class="num">16.7</td><td class="num">-6%</td><td class="num">31%</td></tr>
+          <tr><td>argenx</td><td>ARGX BB</td><td>Health Care</td><td class="num">56.7</td><td class="num">44%</td><td class="num">34%</td><td class="num">0.0%</td><td class="num">30.1</td><td class="num">-</td><td class="num">49%</td></tr>
+          <tr><td>ASML</td><td>ASML NA</td><td>IT</td><td class="num">555.6</td><td class="num">57%</td><td class="num">38%</td><td class="num">0.4%</td><td class="num">29.8</td><td class="num">2%</td><td class="num">134%</td></tr>
+          <tr><td>AstraZeneca</td><td>AZN LN</td><td>Health Care</td><td class="num">218.4</td><td class="num">11%</td><td class="num">12%</td><td class="num">1.9%</td><td class="num">14.7</td><td class="num">-19%</td><td class="num">1%</td></tr>
+          <tr><td>Babcock Intl</td><td>BAB LN</td><td>Industrials</td><td class="num">5.7</td><td class="num">-21%</td><td class="num">67%</td><td class="num">0.5%</td><td class="num">14.7</td><td class="num">65%</td><td class="num">-3%</td></tr>
+          <tr><td>Barclays</td><td>BARC LN</td><td>Financials</td><td class="num">76.0</td><td class="num">8%</td><td class="num">21%</td><td class="num">1.7%</td><td class="num">8.0</td><td class="num">10%</td><td class="num">34%</td></tr>
+          <tr><td>BMW</td><td>BMW GR</td><td>Discretionary</td><td class="num">37.2</td><td class="num">-41%</td><td class="num">33%</td><td class="num">7.1%</td><td class="num">7.1</td><td class="num">1%</td><td class="num">-32%</td></tr>
+          <tr><td>BT Group</td><td>BT/A LN</td><td>Telecoms</td><td class="num">23.9</td><td class="num">-2%</td><td class="num">4%</td><td class="num">3.9%</td><td class="num">10.7</td><td class="num">29%</td><td class="num">-3%</td></tr>
+          <tr><td>Richemont</td><td>CFR SW</td><td>Discretionary</td><td class="num">116.6</td><td class="num">-3%</td><td class="num">23%</td><td class="num">1.4%</td><td class="num">25.3</td><td class="num">14%</td><td class="num">36%</td></tr>
+          <tr><td>Continental</td><td>CON GR</td><td>Discretionary</td><td class="num">13.9</td><td class="num">-21%</td><td class="num">11%</td><td class="num">3.6%</td><td class="num">10.2</td><td class="num">4%</td><td class="num">22%</td></tr>
+          <tr><td>Danone</td><td>BN FP</td><td>Staples</td><td class="num">43.6</td><td class="num">4%</td><td class="num">8%</td><td class="num">3.3%</td><td class="num">15.5</td><td class="num">-9%</td><td class="num">-12%</td></tr>
+          <tr><td>DSV</td><td>DSV DC</td><td>Industrials</td><td class="num">42.7</td><td class="num">27%</td><td class="num">32%</td><td class="num">0.5%</td><td class="num">16.8</td><td class="num">-27%</td><td class="num">-5%</td></tr>
+          <tr><td>Ferrovial</td><td>FER SM</td><td>Industrials</td><td class="num">36.2</td><td class="num">-21%</td><td class="num">18%</td><td class="num">1.5%</td><td class="num">45.2</td><td class="num">-10%</td><td class="num">10%</td></tr>
+          <tr><td>Fraport</td><td>FRA GR</td><td>Industrials</td><td class="num">5.8</td><td class="num">-32%</td><td class="num">9%</td><td class="num">0.0%</td><td class="num">18.4</td><td class="num">20%</td><td class="num">-12%</td></tr>
+          <tr><td>Fresnillo</td><td>FRES LN</td><td>Materials</td><td class="num">26.5</td><td class="num">45%</td><td class="num">0%</td><td class="num">0.6%</td><td class="num">13.8</td><td class="num">-29%</td><td class="num">60%</td></tr>
+          <tr><td>Inditex</td><td>ITX SM</td><td>Discretionary</td><td class="num">175.7</td><td class="num">6%</td><td class="num">9%</td><td class="num">2.7%</td><td class="num">24.4</td><td class="num">7%</td><td class="num">36%</td></tr>
+          <tr><td>Jeronimo Martins</td><td>JMT PL</td><td>Staples</td><td class="num">11.4</td><td class="num">11%</td><td class="num">14%</td><td class="num">3.2%</td><td class="num">14.6</td><td class="num">-26%</td><td class="num">-14%</td></tr>
+          <tr><td>Leonardo</td><td>LDO IM</td><td>Industrials</td><td class="num">28.9</td><td class="num">52%</td><td class="num">22%</td><td class="num">1.0%</td><td class="num">18.8</td><td class="num">92%</td><td class="num">5%</td></tr>
+          <tr><td>Marks &amp; Spencer</td><td>MKS LN</td><td>Staples</td><td class="num">9.3</td><td class="num">-25%</td><td class="num">42%</td><td class="num">0.8%</td><td class="num">11.3</td><td class="num">1%</td><td class="num">16%</td></tr>
+          <tr><td>Nemetschek</td><td>NEM GR</td><td>IT</td><td class="num">7.8</td><td class="num">11%</td><td class="num">22%</td><td class="num">0.8%</td><td class="num">24.2</td><td class="num">-50%</td><td class="num">-41%</td></tr>
+          <tr><td>Nokia</td><td>NOKIA FH</td><td>IT</td><td class="num">49.3</td><td class="num">16%</td><td class="num">21%</td><td class="num">1.6%</td><td class="num">22.4</td><td class="num">53%</td><td class="num">133%</td></tr>
+          <tr><td>Novonesis</td><td>NSISB DC</td><td>Materials</td><td class="num">28.4</td><td class="num">37%</td><td class="num">11%</td><td class="num">0.9%</td><td class="num">27.9</td><td class="num">-3%</td><td class="num">13%</td></tr>
+          <tr><td>Orange</td><td>ORA FP</td><td>Telecoms</td><td class="num">41.6</td><td class="num">45%</td><td class="num">-8%</td><td class="num">4.6%</td><td class="num">13.1</td><td class="num">26%</td><td class="num">13%</td></tr>
+          <tr><td>Prudential</td><td>PRU LN</td><td>Financials</td><td class="num">29.4</td><td class="num">12%</td><td class="num">24%</td><td class="num">1.7%</td><td class="num">10.3</td><td class="num">-5%</td><td class="num">3%</td></tr>
+          <tr><td>RWE</td><td>RWE GR</td><td>Utilities</td><td class="num">44.9</td><td class="num">19%</td><td class="num">11%</td><td class="num">1.7%</td><td class="num">18.4</td><td class="num">25%</td><td class="num">71%</td></tr>
+          <tr><td>Saipem</td><td>SPM IM</td><td>Energy</td><td class="num">8.9</td><td class="num">9%</td><td class="num">84%</td><td class="num">3.7%</td><td class="num">17.4</td><td class="num">9%</td><td class="num">84%</td></tr>
+          <tr><td>Shell</td><td>SHEL LN</td><td>Energy</td><td class="num">228.5</td><td class="num">69%</td><td class="num">-15%</td><td class="num">3.0%</td><td class="num">9.8</td><td class="num">-1%</td><td class="num">26%</td></tr>
+          <tr><td>Siemens</td><td>SIE GR</td><td>Industrials</td><td class="num">213.1</td><td class="num">-10%</td><td class="num">16%</td><td class="num">1.9%</td><td class="num">22.0</td><td class="num">46%</td><td class="num">19%</td></tr>
+          <tr><td>Siemens Energy</td><td>ENR GR</td><td>Industrials</td><td class="num">123.5</td><td class="num">175%</td><td class="num">39%</td><td class="num">0.0%</td><td class="num">23.2</td><td class="num">-24%</td><td class="num">68%</td></tr>
+          <tr><td>SSE</td><td>SSE LN</td><td>Utilities</td><td class="num">33.0</td><td class="num">-5%</td><td class="num">19%</td><td class="num">2.5%</td><td class="num">12.2</td><td class="num">0%</td><td class="num">46%</td></tr>
+          <tr><td>Standard Chartered</td><td>STAN LN</td><td>Financials</td><td class="num">55.9</td><td class="num">5%</td><td class="num">18%</td><td class="num">1.2%</td><td class="num">11.4</td><td class="num">26%</td><td class="num">61%</td></tr>
+          <tr><td>Technip Energies</td><td>TE FP</td><td>Energy</td><td class="num">5.4</td><td class="num">-4%</td><td class="num">51%</td><td class="num">2.8%</td><td class="num">11.4</td><td class="num">9%</td><td class="num">-26%</td></tr>
+          <tr><td>UBS</td><td>UBSG SW</td><td>Financials</td><td class="num">154.5</td><td class="num">56%</td><td class="num">22%</td><td class="num">1.6%</td><td class="num">13.0</td><td class="num">23%</td><td class="num">41%</td></tr>
+          <tr><td>Unilever</td><td>ULVR LN</td><td>Staples</td><td class="num">119.1</td><td class="num">5%</td><td class="num">7%</td><td class="num">3.6%</td><td class="num">16.5</td><td class="num">-10%</td><td class="num">-6%</td></tr>
+          <tr><td>Universal Music</td><td>UMG NA</td><td>Telecoms</td><td class="num">26.5</td><td class="num">-8%</td><td class="num">11%</td><td class="num">3.6%</td><td class="num">14.1</td><td class="num">-43%</td><td class="num">-40%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="tbl-src">Source: Datastream, MSCI, IBES (가격·밸류에이션 2026/9/2 종가 기준)</div>
+
+      <h3 class="sec" id="s8"><span class="n">8</span>데이터: 자금 흐름 · 실적 · 밸류에이션</h3>
+      <h4 class="sub">DM 주식 펀드 플로우 (8/26 기준, % AUM)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>지역</th><th class="num">1w</th><th class="num">1m</th><th class="num">3m</th><th class="num">YTD</th><th class="num">12m</th><th class="num">12m ($mn)</th></tr></thead>
+        <tbody>
+          <tr><td>Europe ex UK</td><td class="num">-0.1%</td><td class="num">0.1%</td><td class="num">-1.6%</td><td class="num">-2.9%</td><td class="num">-2.6%</td><td class="num">-11,446</td></tr>
+          <tr><td>UK</td><td class="num">-0.1%</td><td class="num">-0.9%</td><td class="num">-2.0%</td><td class="num">-3.8%</td><td class="num">-7.2%</td><td class="num">-22,010</td></tr>
+          <tr><td>US</td><td class="num">0.0%</td><td class="num">0.3%</td><td class="num">1.6%</td><td class="num">2.9%</td><td class="num">4.9%</td><td class="num">658,891</td></tr>
+          <tr><td>Japan</td><td class="num">0.2%</td><td class="num">0.3%</td><td class="num">0.4%</td><td class="num">2.4%</td><td class="num">2.8%</td><td class="num">27,232</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="tbl-src">Source: EPFR (Japan은 BoJ 매입 포함)</div>
+
+      <h4 class="sub">주요 지역 EPS 성장률 컨센서스 &amp; 밸류에이션 (9/2 기준)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>지역 / 지수</th><th class="num">EPS 2025E</th><th class="num">EPS 2026E</th><th class="num">EPS 2027E</th><th class="num">12m Fwd P/E</th><th class="num">P/E 2026E</th><th class="num">DY 12m Fwd</th></tr></thead>
+        <tbody>
+          <tr><td>United States (S&amp;P 500)</td><td class="num">13.7</td><td class="num">33.1</td><td class="num">16.1</td><td class="num">19.5</td><td class="num">21.9</td><td class="num">1.1%</td></tr>
+          <tr><td>Europe (MSCI Europe)</td><td class="num">-0.4</td><td class="num">19.6</td><td class="num">9.8</td><td class="num">14.6</td><td class="num">15.6</td><td class="num">3.1%</td></tr>
+          <tr><td>Europe ex UK</td><td class="num">-2.6</td><td class="num">19.1</td><td class="num">11.3</td><td class="num">15.4</td><td class="num">16.6</td><td class="num">3.0%</td></tr>
+          <tr><td>EMU (MSCI EMU)</td><td class="num">-4.3</td><td class="num">22.3</td><td class="num">12.4</td><td class="num">14.7</td><td class="num">16.0</td><td class="num">3.1%</td></tr>
+          <tr><td>United Kingdom (FTSE 100)</td><td class="num">6.9</td><td class="num">20.3</td><td class="num">5.8</td><td class="num">12.7</td><td class="num">13.1</td><td class="num">3.5%</td></tr>
+          <tr><td>Germany (DAX)</td><td class="num">5.2</td><td class="num">7.8</td><td class="num">15.6</td><td class="num">15.0</td><td class="num">16.7</td><td class="num">2.9%</td></tr>
+          <tr><td>France (CAC 40)</td><td class="num">-22.9</td><td class="num">45.6</td><td class="num">9.5</td><td class="num">13.8</td><td class="num">14.7</td><td class="num">3.4%</td></tr>
+          <tr><td>Japan (Topix)</td><td class="num">11.6</td><td class="num">18.2</td><td class="num">11.4</td><td class="num">15.9</td><td class="num">16.7</td><td class="num">2.2%</td></tr>
+          <tr class="hl"><td>Emerging Markets (MSCI EM)</td><td class="num">10.5</td><td class="num">72.0</td><td class="num">23.3</td><td class="num">10.0</td><td class="num">11.6</td><td class="num">2.6%</td></tr>
+          <tr><td>Global (MSCI AC World)</td><td class="num">10.2</td><td class="num">34.2</td><td class="num">15.7</td><td class="num">16.8</td><td class="num">18.7</td><td class="num">1.7%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="tbl-src">Source: IBES, MSCI, Datastream</div>
+
+      <h4 class="sub">MSCI Europe 섹터 — 성과 &amp; 밸류에이션 (현지통화, 9/2 기준)</h4>
+      <div class="tbl-wrap">
+      <table class="tbl small">
+        <thead><tr><th>섹터</th><th class="num">4주</th><th class="num">12m</th><th class="num">YTD</th><th class="num">EPS 26E</th><th class="num">EPS 27E</th><th class="num">P/E 26e</th><th class="num">DY 26e</th></tr></thead>
+        <tbody>
+          <tr class="hl"><td>Europe</td><td class="num">-1.4</td><td class="num">18.7</td><td class="num">9.1</td><td class="num">19.6</td><td class="num">9.8</td><td class="num">15.6</td><td class="num">3.1%</td></tr>
+          <tr><td>Energy</td><td class="num">5.9</td><td class="num">38.5</td><td class="num">35.8</td><td class="num">76.6</td><td class="num">-17.3</td><td class="num">8.4</td><td class="num">4.2%</td></tr>
+          <tr><td>Materials</td><td class="num">1.1</td><td class="num">28.6</td><td class="num">17.3</td><td class="num">32.6</td><td class="num">10.8</td><td class="num">17.7</td><td class="num">2.8%</td></tr>
+          <tr><td>&nbsp;&nbsp;Metals &amp; Mining</td><td class="num">2.5</td><td class="num">82.3</td><td class="num">30.9</td><td class="num">59.8</td><td class="num">12.3</td><td class="num">14.9</td><td class="num">3.0%</td></tr>
+          <tr><td>Industrials</td><td class="num">-5.1</td><td class="num">15.4</td><td class="num">7.8</td><td class="num">15.3</td><td class="num">14.0</td><td class="num">22.0</td><td class="num">2.1%</td></tr>
+          <tr><td>&nbsp;&nbsp;Capital Goods</td><td class="num">-5.6</td><td class="num">18.7</td><td class="num">10.1</td><td class="num">15.6</td><td class="num">16.4</td><td class="num">23.5</td><td class="num">1.9%</td></tr>
+          <tr><td>Consumer Discretionary</td><td class="num">-4.5</td><td class="num">-4.5</td><td class="num">-12.6</td><td class="num">142.2</td><td class="num">21.1</td><td class="num">16.4</td><td class="num">2.6%</td></tr>
+          <tr><td>&nbsp;&nbsp;Automobile</td><td class="num">-0.5</td><td class="num">-16.4</td><td class="num">-16.0</td><td class="num">-</td><td class="num">32.8</td><td class="num">9.9</td><td class="num">3.8%</td></tr>
+          <tr><td>Consumer Staples</td><td class="num">-3.3</td><td class="num">-0.1</td><td class="num">-0.3</td><td class="num">3.4</td><td class="num">7.6</td><td class="num">16.2</td><td class="num">3.3%</td></tr>
+          <tr><td>Healthcare</td><td class="num">0.7</td><td class="num">10.3</td><td class="num">0.7</td><td class="num">4.9</td><td class="num">8.9</td><td class="num">16.2</td><td class="num">2.4%</td></tr>
+          <tr><td>Financials</td><td class="num">-0.4</td><td class="num">29.9</td><td class="num">14.6</td><td class="num">11.6</td><td class="num">12.4</td><td class="num">12.1</td><td class="num">4.2%</td></tr>
+          <tr><td>&nbsp;&nbsp;Banks</td><td class="num">-0.9</td><td class="num">45.4</td><td class="num">20.6</td><td class="num">10.3</td><td class="num">13.8</td><td class="num">11.5</td><td class="num">4.6%</td></tr>
+          <tr><td>Real Estate</td><td class="num">-6.4</td><td class="num">19.7</td><td class="num">9.3</td><td class="num">-3.0</td><td class="num">4.1</td><td class="num">14.1</td><td class="num">5.0%</td></tr>
+          <tr><td>Information Technology</td><td class="num">-0.7</td><td class="num">55.3</td><td class="num">31.1</td><td class="num">25.9</td><td class="num">29.4</td><td class="num">31.0</td><td class="num">1.0%</td></tr>
+          <tr><td>&nbsp;&nbsp;Semicon &amp; Semicon Equip</td><td class="num">-2.4</td><td class="num">120.7</td><td class="num">56.9</td><td class="num">55.3</td><td class="num">42.4</td><td class="num">36.4</td><td class="num">0.7%</td></tr>
+          <tr><td>&nbsp;&nbsp;Software and Services</td><td class="num">4.1</td><td class="num">-11.8</td><td class="num">-5.4</td><td class="num">9.7</td><td class="num">14.0</td><td class="num">25.5</td><td class="num">1.4%</td></tr>
+          <tr><td>Telecoms</td><td class="num">4.1</td><td class="num">-6.8</td><td class="num">1.5</td><td class="num">10.5</td><td class="num">12.7</td><td class="num">16.5</td><td class="num">3.4%</td></tr>
+          <tr><td>Utilities</td><td class="num">-4.1</td><td class="num">24.9</td><td class="num">7.6</td><td class="num">7.5</td><td class="num">7.3</td><td class="num">14.9</td><td class="num">4.2%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="tbl-src">Source: MSCI, IBES, Datastream</div>
+
+      <h3 class="sec" id="risk"><span class="n">!</span>리스크 &amp; 모니터링 포인트</h3>
+      <div class="risk-box">
+        <h4>강세 시각에 대한 주요 리스크</h4>
+        <ul>
+          <li><b>지정학 재확산:</b> 미국-이란 간 보복 타격 격화가 유가를 밀어올리고 안전자산으로서 달러·미국 주식 상대 강세를 재점화할 경우 非미국·EM 콜이 훼손될 수 있음 (Brent 지난주 +7%).</li>
+          <li><b>인플레 기대 de-anchoring / 금리:</b> US 10Y가 5.5% 이상으로 올라서면 멀티플 압축이 가팔라지는 구간에 진입. 재정 지속가능성 우려·회사채 공급 증가·매파적 Fed 시그널(Warsh)이 결합될 경우 리스크.</li>
+          <li><b>Downside 시나리오:</b> 인플레 재상승으로 Fed가 금리를 인상하고 지정학 불확실성이 추가 확대되는 조합.</li>
+          <li><b>메모리/Semis 트레이드 변동성:</b> EM 트레이드는 Semis 안정화 가정에 의존. EM 전략팀도 Q4까지 단기 역풍이 변동성을 유발할 수 있다고 경고.</li>
+          <li><b>중국 활동:</b> Metals &amp; Mining OW 및 EM 콜의 핵심 wildcard.</li>
+          <li><b>미국 밸류에이션·positioning:</b> S&amp;P500 Fwd P/E 21x, 가계 주식 비중 사상 최고, positioning stretched — 미국의 조정이 글로벌 리스크 선호에 전이될 가능성.</li>
+        </ul>
+        <h4 style="margin-top:14px;">모니터링 포인트</h4>
+        <ul>
+          <li>지역별 주간 EPS revisions 및 이익 breadth (특히 EM·유로존)</li>
+          <li>US ISM·유로존 제조업 PMI·CESI의 상승 추세 지속 여부</li>
+          <li>Atlanta Fed Wage Tracker, 시간당 임금 yoy, headline CPI의 유가 기저효과 소멸 경로</li>
+          <li>US 10Y(5.5% 임계치), term premia, 실질금리, Fed funds futures 재가격</li>
+          <li>USD net positioning·DXY, EM FX 방향</li>
+          <li>EM 주식 자금 유입 재개 지속 여부, EM의 글로벌 AUM 비중(6%) 정상화</li>
+          <li>MSCI AC World 종목 breadth(3개월 기준 지수 상회 비중), Cyclicals vs Defensives, Mag-7 상대 성과</li>
+          <li>KOSPI·MSCI EM IT 상대 성과, 한국 기업 buybacks 추이, 대만 수출주문</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div>본 문서는 투자 권유를 목적으로 하지 않습니다.</div>
+  </footer>
+
+</div>
+</body>
+</html>
