@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>어떤 AI 병목에 투자할 것인가</title>
+<style>
+  :root{
+    --brand:#00264d;
+    --brand-deep:#001a36;
+    --accent:#0077c8;
+    --accent2:#005a99;
+    --paper:#f4f6f9;
+    --card:#ffffff;
+    --ink:#1b1e24;
+    --ink-soft:#525866;
+    --line:#dde3ec;
+    --buy:#1f7a4d;
+    --bear:#c0392b;
+    --bull:#1f6fb2;
+    --warn:#8a4b15;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Helvetica Neue','Pretendard','Noto Sans KR',Arial,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased;}
+  .topbar{background:var(--brand-deep);color:#fff;padding:14px 6vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:3px solid var(--accent);position:sticky;top:0;z-index:50;}
+  .topbar .logo{font-weight:700;font-size:18px;letter-spacing:0.5px;}
+  .topbar .logo span{color:var(--accent);}
+  .topbar nav{display:flex;gap:8px;flex-wrap:wrap;}
+  .topbar nav a{color:#cfd8e6;text-decoration:none;font-size:12.5px;padding:6px 12px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;transition:all .15s;}
+  .topbar nav a:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 6vw 90px;}
+  .intro{border-left:4px solid var(--accent);padding:8px 0 8px 20px;margin-bottom:48px;}
+  .intro .eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent2);font-weight:700;}
+  .intro h1{font-size:26px;margin:8px 0 6px;color:var(--brand);}
+  .report{margin-bottom:64px;scroll-margin-top:70px;}
+  .report-head{background:linear-gradient(135deg,var(--brand) 0%, var(--brand-deep) 100%);color:#fff;border-radius:10px 10px 0 0;padding:28px 30px;}
+  .report-head .tag{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9fb4d4;font-weight:700;}
+  .report-head h2{margin:8px 0 14px;font-size:23px;line-height:1.35;}
+  .report-head .lede{font-family:'Georgia',serif;font-size:15.5px;color:#e3ebf6;border-top:1px solid rgba(255,255,255,0.16);padding-top:14px;margin:0;}
+  .report-body{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;padding:30px;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;}
+  .chip{border:1px solid var(--line);border-radius:8px;padding:10px 16px;background:#fafbfd;flex:1;min-width:130px;}
+  .chip .k{font-size:10.5px;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink-soft);}
+  .chip .v{font-size:19px;font-weight:700;color:var(--brand);margin-top:2px;}
+  .chip .v.buy{color:var(--buy);}
+  .chip .v.sell{color:var(--bear);}
+  .chip .s{font-size:11px;color:var(--ink-soft);}
+  h3.sec{font-size:17px;color:var(--brand);margin:30px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;gap:10px;scroll-margin-top:70px;}
+  h3.sec .n{background:var(--brand);color:#fff;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  h4.sub{font-size:14.5px;color:var(--accent2);margin:18px 0 6px;}
+  ul.pts{margin:0;padding:0;list-style:none;}
+  ul.pts li{position:relative;padding:7px 0 7px 20px;font-size:14.5px;border-bottom:1px dashed var(--line);}
+  ul.pts li:last-child{border-bottom:none;}
+  ul.pts li::before{content:"—";position:absolute;left:0;color:var(--accent2);font-weight:700;}
+  ul.pts b{color:var(--brand);}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 4px;}
+  table.tbl th{background:var(--brand);color:#fff;text-align:left;padding:8px 10px;font-weight:600;}
+  table.tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+  table.tbl tr:nth-child(even) td{background:#f7f9fc;}
+  table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  table.tbl td.buy{color:var(--buy);font-weight:700;}
+  table.tbl td.sell{color:var(--bear);}
+  table.tbl td.neg{color:var(--bear);}
+  .tbl-wrap{overflow-x:auto;}
+  .chart-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px 22px 14px;margin:14px 0;}
+  .chart-card .ct{font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;}
+  .chart-src{font-size:10.5px;color:#9aa3b2;margin-top:8px;}
+  .legend{display:flex;gap:14px;font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:11px;height:11px;border-radius:2px;display:inline-block;}
+  .bbgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0;}
+  @media(max-width:680px){.bbgrid{grid-template-columns:1fr;}}
+  .bb{border-radius:8px;padding:16px;border:1px solid var(--line);background:#fafbfd;}
+  .bb.bull{border-top:3px solid var(--bull);}
+  .bb.base{border-top:3px solid var(--ink-soft);}
+  .bb.bear{border-top:3px solid var(--bear);}
+  .bb .lbl{font-size:11px;letter-spacing:0.6px;text-transform:uppercase;font-weight:700;color:var(--ink-soft);}
+  .bb .px{font-size:18px;font-weight:700;color:var(--brand);margin:4px 0;}
+  .bb .ret{font-size:12.5px;font-weight:600;color:var(--accent2);}
+  .bb ul{margin:8px 0 0;padding-left:16px;font-size:12px;color:var(--ink-soft);}
+  .bb li{margin-bottom:4px;}
+  .callout{background:#fbf6ec;border:1px solid #e8dcc3;border-radius:8px;padding:14px 18px;font-size:13px;color:var(--ink-soft);margin-top:14px;}
+  .callout .t{font-size:10.5px;font-weight:700;letter-spacing:0.6px;color:var(--warn);text-transform:uppercase;display:block;margin-bottom:5px;}
+  .risk-box{background:var(--brand);color:#dde6f3;border-radius:8px;padding:22px 24px;margin-top:14px;}
+  .risk-box h4{margin:0 0 10px;color:#fff;font-size:14.5px;}
+  .risk-box ul{margin:0;padding-left:18px;}
+  .risk-box li{margin-bottom:8px;font-size:13px;}
+  .risk-box li b{color:#fff;}
+  footer{border-top:1px solid var(--line);margin-top:50px;padding-top:20px;font-size:11px;color:#9aa3b2;line-height:1.6;}
+  @media(max-width:560px){.intro h1{font-size:21px;}.report-head h2{font-size:19px;}.report-body{padding:20px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Research<span>·</span>Digest</div>
+  <nav>
+    <a href="#s1">요약</a>
+    <a href="#s3">실적 모멘텀</a>
+    <a href="#s5">AI Compute</a>
+    <a href="#s6">Memory</a>
+    <a href="#s8">Networking</a>
+    <a href="#s9">Analog</a>
+    <a href="#s11">Stock Picks</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <div class="intro">
+    <div class="eyebrow">7 September 2026</div>
+    <h1>어떤 AI 병목에 투자할 것인가?</h1>
+  </div>
+
+  <section class="report" id="rpt1">
+    <div class="report-head">
+      <div class="tag">Tech Bytes | Asia Pacific · S. Korea Technology</div>
+      <h2>어떤 AI 병목에 투자할 것인가? — AI Compute 최선호, Networking 차선호, Memory는 선별적 접근</h2>
+      <p class="lede">Astra GPT-6 출시로 AI 병목 내러티브가 강화됐다. 투자자의 positioning 축소, 매크로 불확실성, 최근 draw-down 이후의 wall of worry를 감안하면 이제는 과잉투자보다 과소투자의 리스크가 더 크다. 다만 밸류에이션이 정상화된 Tech는 순수 earnings momentum 섹터로 변해가고 있으며, "싸졌기 때문"이 아니라 "실적 모멘텀이 개선될 때" 매수해야 한다.</p>
+    </div>
+
+    <div class="report-body">
+
+      <div class="chips">
+        <div class="chip"><div class="k">Industry View</div><div class="v buy">Attractive</div><div class="s">S. Korea Technology</div></div>
+        <div class="chip"><div class="k">선호 순위</div><div class="v">Compute &gt; Networking &gt; Memory</div><div class="s">Non-AI 헤지는 Analog</div></div>
+        <div class="chip"><div class="k">2027 AI 수혜주 EPS 성장</div><div class="v">56% → 53%</div><div class="s">컨센서스 vs 리포트 추정</div></div>
+        <div class="chip"><div class="k">Scale-up 네트워킹 TAM</div><div class="v">&gt;US$70bn</div><div class="s">2030년, 1년 전 추정의 4배 이상</div></div>
+        <div class="chip"><div class="k">Hyperscaler Capex</div><div class="v">$1,390bn</div><div class="s">2027e (2026e $861bn)</div></div>
+      </div>
+
+      <h3 class="sec" id="s1"><span class="n">1</span>투자 요약 — 구조적 AI 성장과 초기 사이클 Non-AI 회복의 바벨 전략</h3>
+      <ul class="pts">
+        <li><b>AI Compute — 최선호(highest-conviction)</b>: GPU/CPU/ASIC, TSMC, 그리고 하이엔드 기판(ABF)·커패시터(MLCC) 등 다운스트림 하드웨어까지 강한 unit growth와 지속적인 실적 upside가 결합.</li>
+        <li><b>Networking — 차선호</b>: accelerator domain 확대로 scale-up 네트워킹 기회가 크게 확장. 다만 optics 전환은 기존 가정보다 점진적(evolutionary)일 전망 → 공격적 단기 CPO ramp에만 의존하기보다 광·전기·아키텍처 enabling 기술 전반에 분산 노출 선호.</li>
+        <li><b>Memory — 구조적 스토리는 유지하나 더 선별적</b>: 상품 사이클이 late-cycle에 접근, 가격 결정력 완화, 실적 서프라이즈 감소. 레거시 메모리(DDR4, SLC NAND, NOR), 중국 semicap localization, AI compute가 주도하는 WFE 내 패키징·테스트 부문을 일반적 front-end 노출보다 선호.</li>
+        <li><b>Non-AI — 사이클 저점 영역(소비자 end market) 선호</b>: 수요 정상화 시 강한 반등 예상. 글로벌 Analog가 가장 매력적인 early-cycle 분산 기회, 스마트폰·PC·소비자 가전은 여전히 도전적이나 사이클 저점을 통과 중.</li>
+      </ul>
+
+      <h4 class="sub">시장이 과소평가하는 세 가지 dynamic</h4>
+      <ul class="pts">
+        <li>최근 출시된 <b>GPT-6 Astra</b>의 영향과 글로벌 Tech 수혜주.</li>
+        <li><b>공급 타이트 기간의 연장</b>: 실질적 capacity 증설 부재(ABF 기판) 또는 제조 복잡성 상승(HBM4E의 BEOL 복잡성).</li>
+        <li>AI 밖에서도 실적이 잘 나오며 조용히 작동하는 종목들.</li>
+      </ul>
+
+      <h3 class="sec" id="s2"><span class="n">2</span>GPT-6 Astra — Compute·Inference 수요를 끌어올리는 이유</h3>
+      <ul class="pts">
+        <li>Astra의 의미는 단순히 <b>10만 개 GPU</b>로 학습된 또 하나의 모델 업그레이드(스케일링 지속, 칩 증가에 따른 운영비 상승)가 아님.</li>
+        <li>핵심은 <b>기능의 폭과 상호운용성</b>: reasoning, engineering, computer use, physical-world task 전반에서 frontier AI가 크게 전진. 이것이 상업적으로 유용한 애플리케이션으로 이어지면 AI 매출 pool이 현재의 지배적 use case를 훨씬 넘어 확장 가능.</li>
+        <li>최근 drawdown 기간 시장의 논쟁은 "알려진 AI 수요를 서비스하는 데 인프라가 얼마나 필요한가"였으나, Astra는 질문을 <b>"모델 지능이 개선되면 얼마나 많은 새 workload가 경제성을 갖게 되는가"</b>로 바꿔놓음.</li>
+        <li><b>탄력성(elasticity) 효과</b>: 달러당 AI 유용성이 높아질수록 inference workload의 수·지속시간·복잡성 증가 → 병목 내러티브가 "수요 형성"에서 다시 <b>"지능을 스케일로 전달하기 위한 물리적 제약"</b>으로 이동.</li>
+      </ul>
+
+      <h3 class="sec" id="s3"><span class="n">3</span>실적은 여전히 중요 — 최고의 시절은 지났는가?</h3>
+      <ul class="pts">
+        <li>상대적 earnings momentum이 개선되기 전까지 Tech의 outperform 시작은 기대하기 어려움. 최근 실적 시즌은 'AI party'가 계속되고 있음을 확인했으나 주가는 긍정적으로 반응하지 않았고, 모든 기업이 높은 기대치를 충족하지도 못함.</li>
+        <li>전통적으로 상대적 실적 추정치 상향 모멘텀이 양(+)일 때는 밸류에이션의 중요성이 낮아지고 섹터가 outperform. 반대로 음(-)일 때는 밸류에이션 부담이 실적 부진을 증폭시켜 큰 폭 underperform.</li>
+        <li><b>실적 전달력(earnings deliverability)과 추정치 하향을 견디는 능력</b>이 단기 주가의 가장 중요한 동인.</li>
+        <li>AI 수혜주는 더 이상 non-AI Tech 대비 실적 상향 모멘텀에서 앞서지 못함. 실적 revision breadth(3M 이동평균) 기준 forward 모멘텀은 <b>AI compute &gt; Networking &gt; Non-AI</b> 순으로 양호하며, <b>Memory는 이미 정점을 지난 것</b>으로 보임.</li>
+        <li>Bottom-up으로 AI 수혜주의 <b>2027년 컨센서스 EPS 성장률은 56%</b>이며, 2026년 매출 성장이 둔화되는 환경에서 마진 확대까지 반영 → 실현 가능성 낮음. 리포트는 <b>53%</b>를 더 현실적으로 봄.</li>
+      </ul>
+
+      <div class="chart-card">
+        <div class="ct">FY27e EPS 지수 변화 — 버킷별 (2025년 9월 4일 = 100 기준 누적 변화율)</div>
+        <svg viewBox="0 0 880 210" width="100%"><text x="130" y="47" font-size="13" fill="#1b1e24" text-anchor="end">Memory</text><rect x="145" y="30" width="620.0" height="26" rx="3" fill="#00264d"/><text x="773.0" y="48" font-size="13" font-weight="700" fill="#00264d">+1215%</text><text x="130" y="91" font-size="13" fill="#1b1e24" text-anchor="end">Networking</text><rect x="145" y="74" width="68.4" height="26" rx="3" fill="#0077c8"/><text x="221.4" y="92" font-size="13" font-weight="700" fill="#00264d">+134%</text><text x="130" y="135" font-size="13" fill="#1b1e24" text-anchor="end">AI compute</text><rect x="145" y="118" width="52.0" height="26" rx="3" fill="#005a99"/><text x="205.0" y="136" font-size="13" font-weight="700" fill="#00264d">+102%</text><text x="130" y="179" font-size="13" fill="#1b1e24" text-anchor="end">Non-AI</text><rect x="145" y="162" width="17.3" height="26" rx="3" fill="#9aa3b2"/><text x="170.3" y="180" font-size="13" font-weight="700" fill="#00264d">+34%</text></svg>
+        <div class="chart-src">Source: Factset</div>
+      </div>
+
+      <h4 class="sub">Key risks — AI 종목의 리스크는 상대적 개념</h4>
+      <ul class="pts">
+        <li>절대 기준으로 AI 기업들은 시장보다 훨씬 빠르게 성장 중이나, "무엇이 이미 가격에 반영됐는가" 관점에서 최근 실적은 충분한 upside surprise를 제공하지 못함 → 6월 말 이후 주가 약세를 설명.</li>
+        <li><b>2027년부터 AI capex 증가율 둔화</b> 가능(역성장은 아님). 주가는 한계·2차 미분에 반응하므로 이것이 섹터를 계속 압박할 수 있음.</li>
+        <li><b>Don't fight the Fed</b>: 매크로, 유가, 인플레이션, Fed 금리, 미국 선거가 향후 역풍.</li>
+      </ul>
+
+      <h3 class="sec" id="s4"><span class="n">4</span>선호 익스포저 — "AI를 더 사라"가 아니다</h3>
+      <div class="callout"><span class="t">투자 함의</span>더 넓은 inference 사이클이 <b>제한된 물리적 capacity, 상승하는 콘텐츠 밀도(content intensity), 증가하는 제조 복잡성</b>과 만나는 지점에 위치한 기업을 선호.</div>
+      <div class="bbgrid">
+        <div class="bb bull"><div class="lbl">1. AI Compute</div><div class="px">최선호</div><div class="ret">가장 크고 내구성 있는 AI 투자 기회</div>
+          <ul><li>GPU/accelerator: NVIDIA</li><li>Foundry: TSMC</li><li>ASIC/IC design: Broadcom, MediaTek, GUC</li><li>Cloud semi: Aspeed, Montage</li></ul></div>
+        <div class="bb base"><div class="lbl">2. Networking</div><div class="px">차선호</div><div class="ret">Scale-up 기회 확대, 광·전기·아키텍처 전반 분산</div>
+          <ul><li>Optical/scale-up: GLW, LITE, COHR, Furukawa, Fujikura, Soitec</li><li>Test: KEYS</li><li>Networking equipment: Accton</li><li>Asia CPO enablers: TSMC, ASE, FOCI, AllRing, MPI, Winway, Hon Precision</li></ul></div>
+        <div class="bb bear"><div class="lbl">3. Memory</div><div class="px">선별적, late cycle</div><div class="ret">GPT-6 Astra는 단기 내러티브 boost</div>
+          <ul><li>China localisation: CXMT</li><li>Legacy DDR4/SLC NAND/NOR: Winbond, Macronix</li><li>Majors — tactical: SK hynix, Samsung, Kioxia</li></ul></div>
+      </div>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>Key enablers (전 버킷 공통 병목)</th><th>선호 종목</th></tr></thead>
+        <tbody>
+          <tr><td><b>Substrates / CCL</b></td><td>Unimicron, NYPCB, ZDT, Ibiden, SEMCO, GCE, Shengyi</td></tr>
+          <tr><td><b>Passives / MLCC</b></td><td>Murata, SEMCO</td></tr>
+          <tr><td><b>Back-end / OSAT</b></td><td>Advantest, Tokyo Electron, Ebara, Canon, ASE</td></tr>
+          <tr><td><b>SPE</b></td><td>AEIS, MKS, Naura, AMEC, ACMR, ASML</td></tr>
+          <tr><td><b>Power</b></td><td>Delta</td></tr>
+          <tr><td><b>Non-AI Analog</b></td><td>STM, NXP, Renesas (TXN은 가장 깨끗한 broad-cycle read-through)</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="sec" id="s5"><span class="n">5</span>AI Compute — Unit growth와 실적 upside 모두에서 최적</h3>
+      <ul class="pts">
+        <li>GPU, CPU/ASIC, 선단 로직, 부품 생태계 전반에서 수요가 기존 기대치를 상회하며 진행 중.</li>
+        <li><b>TSMC</b>: 2026년 매출 성장 가이던스를 <b>&gt;40% Y/Y</b>로 상향(AI 수요 강화). TSMC AI 반도체 사업의 <b>70~80% CAGR</b>이 합리적이며, AI 반도체가 2026e TSMC 매출의 <b>&gt;30%</b>를 차지할 수 있음. 2026년 capex를 <b>US$60~64bn</b>으로 상향한 것도 AI 수요가 예상보다 강함을 시사.</li>
+        <li>Compute 기회는 GPU/CPU/ASIC·TSMC를 넘어, <b>AI 주도 unit growth가 가격·마진 upside로 전환되는 부품</b>으로 확장.</li>
+        <li><b>ABF 기판</b>: 수요 mix가 PC에서 서버·AI GPU/ASIC·네트워킹으로 구조적 이동. ABF 가격 upcycle은 기존 예상보다 강하고 빠름 → Unimicron 최선호, NYPCB·ZDT 병행. 2027년부터 공급 부족 진입, 신규 capacity는 온라인까지 최소 2년 소요. 2030년까지 공급 부족 gap 확대 전망.</li>
+        <li><b>MLCC</b>: 전력 밀도·성능 요구 상승으로 AI 서버는 훨씬 고부가 MLCC 콘텐츠 필요. 일본 Murata가 Top Pick, 한국 <b>삼성전기</b>는 ABF+MLCC 이중 AI 기회로 <b>2026~28e EPS CAGR 29%</b> 지지. 대만 월간 MLCC 매출은 6월 <b>+36% YoY</b>로 사이클 상승 중. 2H26 직판 계약가격 상승 지속, 고객들의 LTA 요청은 더 강하고 긴 수요 가시성을 재확인.</li>
+      </ul>
+
+      <div class="chart-card">
+        <div class="ct">Hyperscaler / Neocloud Capex — 성장세 지속 (US$bn)</div>
+        <div class="legend" style="flex-wrap:wrap"><span><i style="background:#00264d"></i>GOOGL</span><span><i style="background:#c9a227"></i>AMZN</span><span><i style="background:#1f7a4d"></i>MSFT</span><span><i style="background:#0077c8"></i>META</span><span><i style="background:#7b5ea7"></i>SPCX (AI Capex)</span><span><i style="background:#8a2a3a"></i>CRWV</span><span><i style="background:#6b7280"></i>NBIS</span></div><svg viewBox="0 0 880 320" width="100%"><line x1="90" y1="290" x2="850" y2="290" stroke="#cfd6e0"/><line x1="90" y1="216.5" x2="850" y2="216.5" stroke="#e5e9f0" stroke-dasharray="3,3"/><text x="82" y="220.5" font-size="11" fill="#6b7280" text-anchor="end">$500</text><line x1="90" y1="142.9" x2="850" y2="142.9" stroke="#e5e9f0" stroke-dasharray="3,3"/><text x="82" y="146.9" font-size="11" fill="#6b7280" text-anchor="end">$1,000</text><line x1="90" y1="69.4" x2="850" y2="69.4" stroke="#e5e9f0" stroke-dasharray="3,3"/><text x="82" y="73.4" font-size="11" fill="#6b7280" text-anchor="end">$1,500</text><rect x="130" y="276.6" width="120" height="13.4" fill="#00264d"/><rect x="130" y="257.2" width="120" height="19.4" fill="#c9a227"/><text x="190" y="270.9" font-size="10.5" fill="#fff" text-anchor="middle">$132</text><rect x="130" y="239.9" width="120" height="17.4" fill="#1f7a4d"/><text x="190" y="252.5" font-size="10.5" fill="#fff" text-anchor="middle">$118</text><rect x="130" y="229.3" width="120" height="10.6" fill="#0077c8"/><rect x="130" y="227.4" width="120" height="1.9" fill="#7b5ea7"/><rect x="130" y="225.1" width="120" height="2.2" fill="#8a2a3a"/><rect x="130" y="224.6" width="120" height="0.6" fill="#6b7280"/><text x="190" y="216.6" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">$445</text><text x="190" y="308" font-size="12" fill="#525866" text-anchor="middle">2025</text><rect x="320" y="259.9" width="120" height="30.1" fill="#00264d"/><text x="380" y="278.9" font-size="10.5" fill="#fff" text-anchor="middle">$205</text><rect x="320" y="227.1" width="120" height="32.8" fill="#c9a227"/><text x="380" y="247.5" font-size="10.5" fill="#fff" text-anchor="middle">$223</text><rect x="320" y="201.3" width="120" height="25.7" fill="#1f7a4d"/><text x="380" y="218.2" font-size="10.5" fill="#fff" text-anchor="middle">$175</text><rect x="320" y="180.0" width="120" height="21.3" fill="#0077c8"/><text x="380" y="194.7" font-size="10.5" fill="#fff" text-anchor="middle">$145</text><rect x="320" y="172.1" width="120" height="7.9" fill="#7b5ea7"/><rect x="320" y="166.8" width="120" height="5.3" fill="#8a2a3a"/><rect x="320" y="163.4" width="120" height="3.4" fill="#6b7280"/><text x="380" y="155.4" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">$861</text><text x="380" y="308" font-size="12" fill="#525866" text-anchor="middle">2026e</text><rect x="510" y="234.9" width="120" height="55.1" fill="#00264d"/><text x="570" y="266.4" font-size="10.5" fill="#fff" text-anchor="middle">$375</text><rect x="510" y="187.1" width="120" height="47.8" fill="#c9a227"/><text x="570" y="215.0" font-size="10.5" fill="#fff" text-anchor="middle">$325</text><rect x="510" y="150.3" width="120" height="36.8" fill="#1f7a4d"/><text x="570" y="172.7" font-size="10.5" fill="#fff" text-anchor="middle">$250</text><rect x="510" y="117.2" width="120" height="33.1" fill="#0077c8"/><text x="570" y="137.7" font-size="10.5" fill="#fff" text-anchor="middle">$225</text><rect x="510" y="97.8" width="120" height="19.4" fill="#7b5ea7"/><text x="570" y="111.5" font-size="10.5" fill="#fff" text-anchor="middle">$132</text><rect x="510" y="91.0" width="120" height="6.8" fill="#8a2a3a"/><rect x="510" y="85.6" width="120" height="5.4" fill="#6b7280"/><text x="570" y="77.6" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">$1,390</text><text x="570" y="308" font-size="12" fill="#525866" text-anchor="middle">2027e</text><rect x="700" y="231.2" width="120" height="58.8" fill="#00264d"/><text x="760" y="264.6" font-size="10.5" fill="#fff" text-anchor="middle">$400</text><rect x="700" y="179.7" width="120" height="51.5" fill="#c9a227"/><text x="760" y="209.4" font-size="10.5" fill="#fff" text-anchor="middle">$350</text><rect x="700" y="135.6" width="120" height="44.1" fill="#1f7a4d"/><text x="760" y="161.6" font-size="10.5" fill="#fff" text-anchor="middle">$300</text><rect x="700" y="98.8" width="120" height="36.8" fill="#0077c8"/><text x="760" y="121.2" font-size="10.5" fill="#fff" text-anchor="middle">$250</text><rect x="700" y="69.1" width="120" height="29.7" fill="#7b5ea7"/><text x="760" y="88.0" font-size="10.5" fill="#fff" text-anchor="middle">$202</text><rect x="700" y="62.2" width="120" height="6.9" fill="#8a2a3a"/><rect x="700" y="56.2" width="120" height="6.0" fill="#6b7280"/><text x="760" y="48.2" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">$1,591</text><text x="760" y="308" font-size="12" fill="#525866" text-anchor="middle">2028e</text></svg>
+        <div class="chart-src">Source: company data</div>
+      </div>
+
+      <h3 class="sec" id="s6"><span class="n">6</span>Memory — 펀더멘털은 견조하나 late cycle, 더 선별적으로</h3>
+      <ul class="pts">
+        <li>여전히 강한 메모리 펀더멘털과, 사이클 성숙에 따라 점점 덜 매력적인 <b>상대적 risk/reward</b>를 구분. <b>4Q26까지 late cycle 진입</b>, DRAM 월간 가격의 YoY 상승률 정점 예상.</li>
+        <li>가격은 강하지만 순차적 상승폭은 완만해지고 실적 상향 속도는 이미 둔화 시작. <b>3Q26 DRAM 계약가격 약 +20% Q/Q</b>(기존 추정 DRAM·NAND +15~20% 소폭 상회, 서버 수요 견조 / 소비자·non-AI 부진). <b>4Q26은 +5~10% Q/Q</b> 추적 중, 그 이후 가시성 제한적.</li>
+        <li><b>공급 증가</b>의 영향이 큼: DRAM bit은 <b>YTD +36%</b>(6월 SIA 데이터), 2026년 <b>+31%</b> 추적(기존 25%). 2026 DRAM WFE 추정치는 최근 9개월간 <b>+47% 상향</b>(DRAM 업체들의 장비 pull-in 지속).</li>
+        <li>맥락: 2019년 메모리 다운턴은 2008년보다 훨씬 심각(메모리 매출 <b>-39% YoY</b>). 최근 주가 하락의 주된 동인이 사이클 정점·수요 파괴 우려였다면, 주가 회복을 위해서는 그 가격 우려가 해소되는 것을 확인해야 함.</li>
+        <li><b>메모리 펀더멘털에 대한 bearish call은 아님</b>: DRAM 주가는 6월 고점 대비 <b>30% 이상 하락</b>, 실적 성장에 대한 강세 기대치도 낮아져 late-cycle 우려는 시장에 일부 반영됨.</li>
+        <li>AI가 메모리 사이클의 기간과 경제학을 바꾸는 중: AI compute unit당 DRAM 콘텐츠는 크게 늘었으나 높은 비용 탓에 최근 후퇴 — <b>SOCAMM은 당초 192GB에서 2027년 64GB로 67% 축소</b>, HBM GB 밀도 de-spec은 2027년 말부터 선단 DRAM 웨이퍼 capacity 흡수를 줄일 것. 반면 LTA는 산업 실적의 역사적 변동성을 일부 완화.</li>
+      </ul>
+
+      <h4 class="sub">Upside surprise 요인 — HBM4E의 BEOL 복잡성</h4>
+      <ul class="pts">
+        <li>IC 설계사(NVIDIA/AMD)–메모리(SK hynix/Micron/Samsung)–로직 파운드리 간 <b>3자 co-design</b> 체제로 메모리 조립 방식이 바뀌면서 DRAM·NAND 부족이 예측 가능한 미래까지 지속될 가능성.</li>
+        <li>HBM4E의 BEOL(Back-End of Line) 복잡성은 HBM을 특화 3D 메모리 스택에서 고도로 통합된 <b>custom Chiplet 로직 시스템</b>으로 옮기는 패러다임 전환.</li>
+        <li>BEOL 복잡성 증가는 DRAM 공급 증가를 지연시키고, 이는 다시 NAND 공급 증가를 지연. HBM4E 인터커넥트 레이어 수 증가(예: SK hynix의 dummy bump 도입)로 <b>2026~27e DRAM capex의 상당 부분이 BEOL capacity 확장</b>에 투입돼야 함.</li>
+        <li>결과적으로 FEOL 공정 전환 capex의 의미 있는 증가와 DRAM GB 출하 성장 가속은 <b>2H27부터</b>나 가능.</li>
+        <li>DRAM 업체(장비사의 tier-1 고객)가 장비 제조·납품 slot에서 우선권을 가지므로 NAND capacity 확장은 지연될 가능성. 3D NAND에는 <b>KrF 리소그래피</b> 장비가 특히 중요.</li>
+        <li>BEOL 확장 핵심 수혜주: <b>Canon</b>(trailing-edge KrF 리소), <b>Tokyo Electron</b>(리소 track·BEOL etch), <b>Ebara</b>(CMP).</li>
+      </ul>
+
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>메모리 공급 모델링</th><th>추정</th></tr></thead>
+        <tbody>
+          <tr><td><b>DRAM bit 공급 성장</b></td><td>2026~27e 32~38%</td></tr>
+          <tr><td><b>HBM bit 공급 성장</b></td><td>2027~28e 50%+ (총 bit·conventional bit 대비 크게 상회)</td></tr>
+          <tr><td><b>DRAM greenfield</b></td><td>2027/28 약 500kwpm (Samsung, SK hynix, Micron, CXMT 등)</td></tr>
+          <tr><td><b>NAND</b></td><td>2027년 가장 빠른 성장 부문(다소 낮은 base에서), Leading logic·DRAM 상회</td></tr>
+          <tr><td><b>WFE 신규 투자</b></td><td>2027년 말부터 온라인 → 궁극적으로 가격 사이클 압박</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h4 class="sub">이 단계에서는 구조적 점유율 확대·localization·다운스트림 AI 노출 선호</h4>
+      <ul class="pts">
+        <li><b>중국 메모리는 핵심 예외</b>: <b>CXMT</b>를 8월 26일 OW로 커버리지 개시 — 중국 내 HBM·DDR5 AI/서버 수요, localization, 급속한 capacity 확장 반영. <b>2025~28e bit 출하 CAGR 46%</b> 전망.</li>
+        <li>2027년 <b>HBM3E가 중국 AI GPU의 주요 병목</b>이 될 전망 → 국내 AI 공급망에서 CXMT의 전략적 중요성 상승.</li>
+        <li>글로벌 메모리 매출 점유율은 1980년대 미국 → 1990년대 일본 → 2000년대 이후 한국(60%대) 시대를 거쳐, 2020년대 들어 <b>중국이 부상</b>하는 국면.</li>
+      </ul>
+
+      <h3 class="sec" id="s7"><span class="n">7</span>WFE / SPE — 강세 시나리오 재작성과 사이클 정점 논쟁</h3>
+      <ul class="pts">
+        <li>시장은 지속 기간(AI ROIC)에 대한 명확한 증거 없이 incremental upside에 값을 지불하기를 점점 꺼림. 이 단계에서는 AI compute에 직접 연결된 <b>다운스트림 패키징·테스트 수혜주를 front-end보다 선호</b>. Incremental front-end 메모리 노출에는 덜 constructive.</li>
+        <li>메모리 WFE는 건전하나, 이미 강한 상품 가격을 뒤따르는 capex 국면으로 셋업이 이동 중.</li>
+        <li><b>미국 SPE</b>: OW 내에서 <b>AEIS·MKS를 LAM·KLA보다 강하게 선호</b>. OEM(LAM, AMAT, KLA)의 멀티플 확대는 GM% 개선을 감안하면 일부 정당화되나 밸류에이션이 이미 upside를 반영. AMAT/LAM/KLA는 AEIS/MKS 대비 <b>64% 밸류에이션 프리미엄</b>(역사적 8%). AEIS·MKS는 사이클이 CY27에 정점을 찍는 것처럼 거래 중 — WFE가 CY27에 <b>~$230bn+</b>로 크게 overshoot하는 시나리오에서 AEIS EPS US$20, MKS US$21에 근접, 두 종목 모두 <b>약 13x</b>에 거래되는 셈.</li>
+        <li><b>일본 SPE</b>: HBM 스택 복잡성 상승은 TSV·advanced packaging·테스트 가치를 높임 → <b>Advantest</b>(OW/Top Pick, HBM 테스터).</li>
+        <li><b>유럽 SPE</b>: Top Pick <b>ASML</b>. DRAM·로직 수요의 핵심 수혜주이자 반도체 제조 핵심 툴셋의 지배적 공급자. 2027년 DRAM·로직의 EUV 수요 개선으로 논쟁이 옮겨가며 컨센서스 실적 상향 기대, 중장기 value-based pricing으로 마진 확대.</li>
+        <li><b>중국 SPE</b>: <b>Naura, AMEC, ACMR</b> — 국내 메모리 확장 가속과 localization 수혜. Naura는 etch·deposition·cleaning 전반 노출로 가장 넓은 플랫폼 pick, AMEC은 etch를 넘어 deposition·공정제어로 확장하며 플랫폼형 장비사로 전환(wallet share 확대), ACMR은 wet cleaning 리더십과 저평가된 ECP optionality(TSV metallization·advanced packaging·non-mainland 후공정 수요 upside).</li>
+      </ul>
+      <div class="callout"><span class="t">SPE 핵심 논쟁</span>(1) SPE 주가가 "작동하지 않는" 이유 — 시장은 두 진영으로 갈림: ① SPE는 AI ROIC 트레이드의 일부 ② buyside의 WFE 기대치가 이미 "가득 참". 리포트는 고객들이 clean room 제약을 이미 넘어섰다는 점에서 ①에 공감. (2) Intel의 capex 부활, greenfield NAND 재개, DRAM pull-forward 등 bull case는 대부분 이미 실현 — 남은 것은 추가 capacity 확장 여부. (3) HBM 12-high → 8-high de-spec이 모든 공정 step의 비례 감소를 의미하지는 않음.</div>
+
+      <h3 class="sec" id="s8"><span class="n">8</span>Networking — 단순한 구리 대체를 훨씬 넘어서는 기회</h3>
+      <ul class="pts">
+        <li>Accelerator 클러스터가 커지고 통신 집약적으로 변하면서 네트워킹은 매력적인 AI 인프라 기회. 다만 구리→optics 즉시 전환이 아니라 <b>scale-up 네트워킹의 급속한 확장</b> 관점에서 봐야 함.</li>
+        <li>2030년 scale-up 네트워킹 기회는 <b>&gt;US$70bn</b>으로, 1년 전 추정치의 <b>4배 이상</b>(NVIDIA·Google·AWS 등 accelerator domain 대폭 확대). <b>Rubin은 scale-up domain을 144 GPU, Rubin Ultra는 576 GPU</b>로 확장, 이후 세대에서 추가 확장 가능. 2026~30년 <b>scale-up CAGR 46%</b>.</li>
+        <li><b>구리 — higher for longer</b>: 짧은 거리 intra-rack 연결에서 구리는 latency·전력·비용 우위 유지, SerDes·retimer·커넥터·active copper 개선으로 수명 연장. optics는 scale-up domain이 랙을 넘어 확장되고 대역폭 밀도·전기 I/O 전력이 어려워질수록 필요성 증가.</li>
+        <li>전환 경로는 <b>구리 → NPO/하이브리드 → CPO</b>이지 이분법적 구리→optics 대체가 아님. Scale-up CPO 채택은 2028년 제한적, <b>2029년 이후 본격화</b>. NPO는 optics를 ASIC 가까이 두면서 full CPO보다 serviceability·공급사 유연성이 큰 중간 아키텍처.</li>
+        <li><b>Scale-up 핵심 수혜주</b>: <b>GLW, LITE, COHR</b>이 좋은 위치, <b>KEYS</b>는 광·전기·scale-up·scale-out 전반의 테스트 복잡성 증가에 따른 아키텍처 중립적 수혜주로 OW 상향. GLW는 상대적으로 아키텍처 중립적 optical 노출, LITE는 NPO/CPO 진전에 따른 레이저·optical engine 콘텐츠에 레버리지, COHR은 CPO/NPO 부품 스택 전반에 광범위 노출.</li>
+        <li><b>CPO 공급망 ramp는 실체가 있음</b>: 총 CPO 스위치 출하량 2026년 23k → 2027년 59k → 2030년 ~200k 전망(2025년 5k에서 <b>CAGR 144%</b>), TSMC는 2028년까지 PIC capacity 대폭 확장 계획. 아시아 CPO enabler(TSMC, ASE, FOCI, AllRing, MPI, Winway, Hon Precision) OW. 유럽에서는 photonics SOI 기판 리더십으로 실리콘 포토닉스에 레버리지된 <b>Soitec</b> 선호.</li>
+      </ul>
+
+      <div class="chart-card">
+        <div class="ct">Scale-out CPO 스위치 출하량 전망 (k units)</div>
+        <svg viewBox="0 0 880 300" width="100%"><line x1="80" y1="250" x2="850" y2="250" stroke="#cfd6e0"/><line x1="80" y1="202.3" x2="850" y2="202.3" stroke="#e5e9f0" stroke-dasharray="3,3"/><text x="72" y="206.3" font-size="11" fill="#6b7280" text-anchor="end">50k</text><line x1="80" y1="154.5" x2="850" y2="154.5" stroke="#e5e9f0" stroke-dasharray="3,3"/><text x="72" y="158.5" font-size="11" fill="#6b7280" text-anchor="end">100k</text><line x1="80" y1="106.8" x2="850" y2="106.8" stroke="#e5e9f0" stroke-dasharray="3,3"/><text x="72" y="110.8" font-size="11" fill="#6b7280" text-anchor="end">150k</text><line x1="80" y1="59.1" x2="850" y2="59.1" stroke="#e5e9f0" stroke-dasharray="3,3"/><text x="72" y="63.1" font-size="11" fill="#6b7280" text-anchor="end">200k</text><rect x="135" y="245.2" width="110" height="4.8" fill="#0077c8"/><text x="190" y="237.2" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">5k</text><text x="190" y="268" font-size="12" fill="#525866" text-anchor="middle">2025</text><rect x="325" y="228.0" width="110" height="22.0" fill="#0077c8"/><text x="380" y="220.0" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">23k</text><text x="380" y="268" font-size="12" fill="#525866" text-anchor="middle">2026e</text><rect x="515" y="193.7" width="110" height="56.3" fill="#0077c8"/><text x="570" y="185.7" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">59k</text><text x="570" y="268" font-size="12" fill="#525866" text-anchor="middle">2027e</text><rect x="705" y="59.1" width="110" height="190.9" fill="#00264d"/><text x="760" y="51.1" font-size="12" font-weight="700" fill="#00264d" text-anchor="middle">200k</text><text x="760" y="268" font-size="12" fill="#525866" text-anchor="middle">2030e</text><text x="470" y="288" font-size="11" fill="#9aa3b2" text-anchor="middle">(k units)</text></svg>
+        <div class="chart-src">Source: Yole</div>
+      </div>
+
+      <h3 class="sec" id="s9"><span class="n">9</span>Analog — Early-cycle 헤지</h3>
+      <ul class="pts">
+        <li>사이클 포지셔닝은 메모리와 <b>거의 정반대</b>. 3년 이상 L자형 바닥을 지난 뒤 세 가지 핵심 지표에서 개선: <b>lean한 채널 재고, 안정화되는 가격, 성숙 노드/전력 제품의 선별적 타이트함</b>. 산업용 수주 개선, 가동률·가격은 침체 수준에서 회복 중.</li>
+        <li>AI compute가 우월한 구조적 성장을 제공하는 반면, Analog는 낮은 가동률과 산업 수요 개선에서 오는 전통적 사이클 영업 레버리지를 제공 → AI 노출에 대한 매력적인 early-cycle 보완재이자 헤지.</li>
+        <li>1H26은 upcycle의 시작을 확인. 최소 올해 하반기까지 가격 개선, 재고 재축적, constructive한 book-to-bill 지속 예상. 글로벌 커버리지 대부분이 계절성을 상회하는 end-market 성장을 가이던스했고 채널 여건은 1년 전 대비 일관되게 건전.</li>
+        <li><b>선별적 접근</b>: <b>TXN</b>은 broad-cycle analog 수요의 가장 깨끗한 read-through, <b>NXP</b>는 자동차·데이터센터 트렌드 constructive, <b>STM·Renesas</b>도 산업 수요 개선. 핵심 논쟁은 개선이 지속 가능한 sell-through인지 유통 재고 재축적인지 — 지난 분기 코멘터리는 단기 재고 spike보다 <b>수요 주도 upcycle</b>을 가리킴.</li>
+      </ul>
+
+      <h3 class="sec" id="s10"><span class="n">10</span>전통 End-market — 소비자가 여전히 약한 고리</h3>
+      <ul class="pts">
+        <li><b>AAPL</b>은 AI를 소비자의 손에 쥐어주는 제품으로 전달할 수 있는 첫 기업이라는 점에서 독특한 기회. 성공한다면 소비자가 AI를 직접 체감하게 되면서 스토리가 크게 진전.</li>
+        <li><b>스마트폰 — 중국 신중, iPhone 공급망 유지</b>: 2026년 글로벌 스마트폰 출하 <b>약 -13% Y/Y</b>, Android는 <b>약 -15%</b>. 메모리 비용 상승이 OEM 가격 인상과 수요 파괴를 유발(특히 중간가격대 Android). iPhone은 가격 인상에도 Android 약세 대비 점유율 확대 예상.</li>
+        <li><b>PC — 신중, 밸류체인 내 과잉 build</b>: 메모리 인플레이션이 PC 구매력·수요 압박. 부품 가격 인플레이션을 앞둔 강한 build에도 의미 있는 unit 회복 증거는 제한적, 시장은 정체/약세. <b>2H26 PC 물량 -15~20%</b>, 2027년에도 부진 지속 예상. 다만 OEM은 Chipflation 속 부품 비용을 완전 전가할 pricing power 보유(Lenovo 선호).</li>
+        <li><b>전통 서버 — 혼조, AI/클라우드가 주된 강점</b>: 클라우드 capex 견조, AI 인프라가 accelerator를 넘어 확장되며 CPU 수요 수혜. Hyperscaler/AI 서버 인프라(강세)와 전통 엔터프라이즈 서버(교체 수요가 주된 성장 동인 아님)는 구분 필요.</li>
+        <li><b>소비자 가전 — 신중</b>: 반도체·메모리 수요가 소비자 기기에서 AI/서버 인프라로 계속 이동. 부품 비용 상승은 반도체 산업 매출을 지지하는 동시에 소비자 물량에는 추가 역풍.</li>
+      </ul>
+
+      <h3 class="sec" id="s11"><span class="n">11</span>Stock Picks — 섹터별 최선호 / 최비선호</h3>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>섹터</th><th>산업 view</th><th>Most Favored</th><th>Least Favored</th></tr></thead>
+        <tbody>
+          <tr><td><b>China smartphone</b></td><td>1H26 부품비 상승 피해, 2H26에도 역풍 지속. 다만 악재 대부분 알려져 사이클 저점에 근접</td><td class="buy">Xiaomi</td><td>NA</td></tr>
+          <tr><td><b>Optical lenses</b></td><td>메모리 비용 상승으로 렌즈 스펙 업그레이드에 BOM 압박. 중저가 역풍·하이엔드 양호. CPO/NPO 신사업이 강한 성장동력 될 전망</td><td class="buy">Largan</td><td class="sell">Ofilm, Lianchuang</td></tr>
+          <tr><td><b>PC Semi</b></td><td>CPU·메모리 가격 인상으로 매출·GM 압박. 1H는 선재고 축적 수혜, 2H는 계절성 하회 가능</td><td class="buy">Elan</td><td class="sell">Asmedia</td></tr>
+          <tr><td><b>IGBT</b></td><td>비용 상승·업계 가격 인상으로 가격 회복, 그러나 감가상각·고객 반발로 마진 낮음</td><td class="buy">Infineon, STM</td><td class="sell">Silan Micro</td></tr>
+          <tr><td><b>GaAs Foundry</b></td><td>점유율 확대·광/항공우주 신사업으로 수요 개선. 그러나 기대치 높고 밸류에이션 부담</td><td class="buy">WIN Semi</td><td class="sell">AWSC</td></tr>
+          <tr><td><b>MCU</b></td><td>데이터센터 수요 강세, 소비자 수요 약세. 파운드리·후공정 가격 인상 반영해 가격 상승 예상</td><td class="buy">Espressif, STM, Infineon</td><td class="sell">Nuvoton</td></tr>
+          <tr><td><b>MOSFET</b></td><td>우호적 가격 환경·높은 가동률. 자동차 노출 확대하는 우량 기업 선호</td><td class="buy">Yangjie</td><td class="sell">CR Micro</td></tr>
+          <tr><td><b>OSAT</b></td><td>가격 우호적·가동률 높음. AI 매출 성장 강한 기업 선호</td><td class="buy">ASE</td><td class="sell">JCET</td></tr>
+          <tr><td><b>Cloud Semi</b></td><td>강한 클라우드 capex 사이클 수혜 지속, agentic AI 수요로 TAM 확대</td><td class="buy">Aspeed, Montage</td><td>NA</td></tr>
+          <tr><td><b>IC Foundry</b></td><td>선단·12인치 AI 수요 강세, 8인치 성숙 노드도 일부 회복</td><td class="buy">TSMC</td><td class="sell">Vanguard</td></tr>
+          <tr><td><b>SPE</b></td><td>선단 DRAM·로직 투자 가속으로 2026~27 WFE 강한 성장, advanced packaging/testing 모멘텀 더 강화</td><td class="buy">Tokyo Electron, ASML, ASM</td><td class="sell">Lasertec</td></tr>
+          <tr><td><b>Memory</b></td><td>강한 펀더멘털 vs 사이클 성숙에 따른 덜 매력적인 상대 risk/reward. 구조적 점유율·localization·다운스트림 AI 노출 선호</td><td class="buy">CXMT, Winbond, Macronix</td><td>NA</td></tr>
+          <tr><td><b>IC Design</b></td><td>AI ASIC·CPU 모두 CSP 수요 강세, 향후 매출 성장 매우 강할 전망</td><td class="buy">MediaTek</td><td class="sell">Alchip</td></tr>
+          <tr><td><b>Display</b></td><td>1H26 재고 축적 후 2H26 TV 주문 미지근, 3Q 후반부터 연말 프로모션용 수요 회복. 공급 규율로 큰 가격 하락 방어, IT 패널 가격 보합</td><td class="buy">BOE</td><td>NA</td></tr>
+          <tr><td><b>Power &amp; Networking</b></td><td>AI 서버 전력 소비 증가로 구조적 전원 수요, 열관리·BBU/CBU·HVDC 기회. 데이터 트래픽 급증으로 스위치 수요·스펙 업그레이드</td><td class="buy">Delta, Accton, Infineon, STM, Soitec</td><td>NA</td></tr>
+          <tr><td><b>iPhone</b></td><td>가격 인상 가능성에도 Android 약세 대비 점유율 확대</td><td class="buy">Apple 및 Apple 공급망</td><td>NA</td></tr>
+          <tr><td><b>ABF substrates</b></td><td>2027년부터 공급 부족 → 가격 인상·마진 확대. 신규 capacity 최소 2년 소요</td><td class="buy">SEMCO, Unimicron, NYPCB</td><td>NA</td></tr>
+          <tr><td><b>BT substrates</b></td><td>메모리가 BT 기판 수요 견인, 주요 기판사의 BT→ABF 라인 전환으로 BT capacity 축소</td><td class="buy">Unimicron, NYPCB</td><td>NA</td></tr>
+          <tr><td><b>General server</b></td><td>Hyperscaler capex 성장·agentic AI workload가 범용 서버 수요 견인</td><td class="buy">Wiwynn</td><td>NA</td></tr>
+          <tr><td><b>AI server</b></td><td>Hyperscaler·neocloud AI 서버 수요 CY27까지 견조</td><td class="buy">Wistron, Infineon</td><td class="sell">Compal</td></tr>
+          <tr><td><b>PC/NB</b></td><td>2H26 PC 물량 -15~20%, 2027 부진. 그러나 OEM은 Chipflation 속 부품비 완전 전가 가능</td><td class="buy">Lenovo</td><td class="sell">Acer</td></tr>
+          <tr><td><b>MLCC</b></td><td>AI 수요 주도 타이트한 공급으로 2H26 직판 계약가격 상승 지속, 고객 LTA 요청</td><td class="buy">SEMCO, Murata</td><td class="sell">Yageo</td></tr>
+          <tr><td><b>PCB</b></td><td>AI 서버 보드의 높은 layer 수·복잡한 설계가 PCB capacity 대거 소비 → 공급사 pricing power 강화</td><td class="buy">GCE</td><td>NA</td></tr>
+          <tr><td><b>CCL &amp; CCL materials</b></td><td>AI 서버 보드가 CCL capacity 대거 소비, 핵심 장비 공급 제약으로 증설 제한 → 공급 부족·pricing power 강화</td><td class="buy">Shengyi Tech</td><td>NA</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="sec" id="s12"><span class="n">12</span>Tech 커버리지 주가·EPS 추정치 트래커</h3>
+      <ul class="pts">
+        <li>최근 1개월 주가: <b>iPhone 공급망(+10%), PC/NB 하드웨어(+11%), 기판</b>이 outperform. 연초 이후로는 Memory(+508%)·Substrates(+458%)·Passive(+355%)가 압도적.</li>
+        <li>최근 1개월 EPS 상향: <b>PC/NB 하드웨어(+20%), Networking(+17%), 서버 하드웨어(+10%)</b>가 최대. AI 수혜주 평균은 1M +6.3%, 3M +15.9%, 최근 12개월 +108.5%.</li>
+      </ul>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>서브섹터</th><th>주가 1M</th><th>주가 3M</th><th>주가 YTD</th><th>EPS rev. 1M</th><th>EPS rev. 3M</th><th>EPS rev. 12M</th></tr></thead>
+        <tbody>
+          <tr><td><b>iPhone supply chain</b></td><td class="num">10%</td><td class="num">7%</td><td class="num">63%</td><td class="num">2%</td><td class="num">4%</td><td class="num">23%</td></tr>
+          <tr><td><b>PC/NB Hardware</b></td><td class="num">11%</td><td class="num">15%</td><td class="num">86%</td><td class="num">20%</td><td class="num">28%</td><td class="num">61%</td></tr>
+          <tr><td><b>Substrates</b></td><td class="num">0%</td><td class="num neg">(3%)</td><td class="num">458%</td><td class="num">6%</td><td class="num">28%</td><td class="num">215%</td></tr>
+          <tr><td><b>Server Hardware</b></td><td class="num">8%</td><td class="num">10%</td><td class="num">152%</td><td class="num">10%</td><td class="num">17%</td><td class="num">99%</td></tr>
+          <tr><td><b>Cloud Semis</b></td><td class="num">2%</td><td class="num neg">(2%)</td><td class="num">125%</td><td class="num">5%</td><td class="num">16%</td><td class="num">118%</td></tr>
+          <tr><td><b>Smartphone Hardware</b></td><td class="num">4%</td><td class="num neg">(7%)</td><td class="num neg">(12%)</td><td class="num neg">-5%</td><td class="num neg">-10%</td><td class="num neg">-9%</td></tr>
+          <tr><td><b>Smartphone Semis</b></td><td class="num">4%</td><td class="num neg">(5%)</td><td class="num">68%</td><td class="num neg">-2%</td><td class="num">3%</td><td class="num">14%</td></tr>
+          <tr><td><b>Memory</b></td><td class="num">5%</td><td class="num neg">(9%)</td><td class="num">508%</td><td class="num">3%</td><td class="num">37%</td><td class="num">1205%</td></tr>
+          <tr><td><b>MCU</b></td><td class="num neg">(8%)</td><td class="num neg">(15%)</td><td class="num">24%</td><td class="num">1%</td><td class="num">12%</td><td class="num">52%</td></tr>
+          <tr><td><b>Foundry</b></td><td class="num">3%</td><td class="num neg">(8%)</td><td class="num">120%</td><td class="num">5%</td><td class="num">19%</td><td class="num">82%</td></tr>
+          <tr><td><b>EDA</b></td><td class="num neg">(7%)</td><td class="num neg">(16%)</td><td class="num neg">(15%)</td><td class="num">4%</td><td class="num">2%</td><td class="num">7%</td></tr>
+          <tr><td><b>Passive Component</b></td><td class="num">4%</td><td class="num neg">(20%)</td><td class="num">355%</td><td class="num">2%</td><td class="num">27%</td><td class="num">135%</td></tr>
+          <tr><td><b>Consumer Electronics &amp; Others</b></td><td class="num neg">(3%)</td><td class="num neg">(1%)</td><td class="num">35%</td><td class="num">0%</td><td class="num">1%</td><td class="num">26%</td></tr>
+          <tr><td><b>Panel</b></td><td class="num neg">(10%)</td><td class="num neg">(16%)</td><td class="num neg">(3%)</td><td class="num neg">-5%</td><td class="num neg">-4%</td><td class="num">6%</td></tr>
+          <tr><td><b>SPE</b></td><td class="num neg">(2%)</td><td class="num">3%</td><td class="num">143%</td><td class="num">4%</td><td class="num">19%</td><td class="num">75%</td></tr>
+          <tr><td><b>Networking</b></td><td class="num neg">(3%)</td><td class="num neg">(5%)</td><td class="num">226%</td><td class="num">17%</td><td class="num">29%</td><td class="num">110%</td></tr>
+          <tr><td><b>PC/NB Semis</b></td><td class="num neg">(5%)</td><td class="num neg">(2%)</td><td class="num">130%</td><td class="num">1%</td><td class="num">17%</td><td class="num">65%</td></tr>
+          <tr><td><b>OSAT</b></td><td class="num neg">(4%)</td><td class="num neg">(10%)</td><td class="num">199%</td><td class="num">0%</td><td class="num">19%</td><td class="num">111%</td></tr>
+          <tr><td><b>Analog/Auto Semis</b></td><td class="num neg">(8%)</td><td class="num neg">(19%)</td><td class="num">64%</td><td class="num">2%</td><td class="num">8%</td><td class="num">44%</td></tr>
+          <tr><td><b>평균</b></td><td class="num">0%</td><td class="num neg">(5%)</td><td class="num">143%</td><td class="num">4%</td><td class="num">14%</td><td class="num">128%</td></tr>
+          <tr><td><b>AI Beneficiaries</b></td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">6.3%</td><td class="num">15.9%</td><td class="num">108.5%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="chart-src">Source: Factset</div>
+
+      <h3 class="sec"><span class="n">!</span>리스크 & 모니터링 포인트</h3>
+      <div class="risk-box">
+        <h4>Key Risks</h4>
+        <ul>
+          <li><b>기대치 리스크:</b> 사이클 후반부일수록 높은 기대치 탓에 실망이 쉬움. 투자자는 AI 종목에 "좋은 실적"이 아닌 "완벽한 실적"을 기대 — 실적 전달력과 추정치 하향 내성이 핵심.</li>
+          <li><b>AI capex 2차 미분:</b> 2027년부터 capex 증가율 둔화(역성장 아님)만으로도 주가에는 부담.</li>
+          <li><b>매크로:</b> 유가, 인플레이션, Fed 금리, 미국 선거 — Don't fight the Fed.</li>
+          <li><b>메모리 late cycle:</b> 4Q26 DRAM YoY 가격 정점, 2027년 말 신규 투자 온라인 → 가격 사이클 압박. DRAM bit +31%(2026), DRAM WFE 9개월간 +47% 상향 등 공급 증가가 변수. HBM de-spec·SOCAMM 축소로 AI unit당 DRAM 콘텐츠 후퇴.</li>
+          <li><b>Networking 전환 속도:</b> 구리 수명 연장으로 CPO 채택은 2028년 제한적·2029년 이후 본격화 — 공격적 단기 CPO ramp에만 베팅할 경우 리스크.</li>
+          <li><b>Analog 회복의 성격:</b> 지속 가능한 sell-through인지 유통 재고 재축적(단기 spike)인지가 핵심 논쟁.</li>
+          <li><b>소비자 end-market:</b> 메모리 인플레이션에 따른 스마트폰(-13%)·PC(2H26 -15~20%) 수요 파괴.</li>
+        </ul>
+        <h4 style="margin-top:14px;">모니터링 포인트</h4>
+        <ul>
+          <li>AI compute·Networking·Memory·Non-AI 버킷별 earnings revision breadth(3M 이동평균)의 방향 — Tech outperform의 선행 조건.</li>
+          <li>3Q26 DRAM 계약가격(+20% Q/Q) 및 4Q26(+5~10% Q/Q) 실현 여부, 월간 SIA DRAM bit 성장률.</li>
+          <li>HBM4E BEOL capacity 투자와 2H27 FEOL 전환·DRAM GB 출하 가속 시점, NAND 장비(KrF) 납기 지연 여부.</li>
+          <li>ABF 기판 가격 인상 속도와 2027년 공급 부족 진입, MLCC 직판 계약가·LTA 체결 현황, 대만 월간 MLCC 매출(6월 +36% YoY).</li>
+          <li>CPO 스위치 출하(2026e 23k → 2027e 59k)와 TSMC PIC capacity 확장, Rubin/Rubin Ultra scale-up domain 확대.</li>
+          <li>Analog 채널 재고·가격·book-to-bill 및 산업용 수주 흐름(TXN read-through).</li>
+          <li>Hyperscaler·neocloud capex 가이던스(2027e $1,390bn, 2028e $1,591bn)와 2027년 증가율 둔화 폭.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div>본 문서는 투자 권유를 목적으로 하지 않습니다.</div>
+  </footer>
+
+</div>
+</body>
+</html>
