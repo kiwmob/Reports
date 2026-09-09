@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebius Group (NBIS)</title>
+<style>
+  :root{
+    --brand:#1a2b4a;
+    --brand-deep:#0e1729;
+    --accent:#6b8cae;
+    --accent2:#3d5a80;
+    --paper:#f4f6f9;
+    --card:#ffffff;
+    --ink:#1b1e24;
+    --ink-soft:#525866;
+    --line:#dde3ec;
+    --buy:#1f7a4d;
+    --bear:#c0392b;
+    --bull:#1f6fb2;
+    --warn:#8a4b15;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Helvetica Neue','Pretendard','Noto Sans KR',Arial,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 6vw 90px;}
+  .intro{border-left:4px solid var(--accent);padding:8px 0 8px 20px;margin-bottom:48px;}
+  .intro .eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent2);font-weight:700;}
+  .intro h1{font-size:26px;margin:8px 0 6px;color:var(--brand);}
+  .report{margin-bottom:64px;scroll-margin-top:70px;}
+  .report-head{background:linear-gradient(135deg,var(--brand) 0%, var(--brand-deep) 100%);color:#fff;border-radius:10px 10px 0 0;padding:28px 30px;}
+  .report-head .tag{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9fb4d4;font-weight:700;}
+  .report-head h2{margin:8px 0 14px;font-size:23px;line-height:1.35;}
+  .report-head .lede{font-family:'Georgia',serif;font-size:15.5px;color:#e3ebf6;border-top:1px solid rgba(255,255,255,0.16);padding-top:14px;margin:0;}
+  .report-body{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;padding:30px;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;}
+  .chip{border:1px solid var(--line);border-radius:8px;padding:10px 16px;background:#fafbfd;flex:1;min-width:130px;}
+  .chip .k{font-size:10.5px;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink-soft);}
+  .chip .v{font-size:19px;font-weight:700;color:var(--brand);margin-top:2px;}
+  .chip .v.buy{color:var(--buy);}
+  .chip .s{font-size:11px;color:var(--ink-soft);}
+  h3.sec{font-size:17px;color:var(--brand);margin:30px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;gap:10px;}
+  h3.sec .n{background:var(--brand);color:#fff;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  ul.pts{margin:0;padding:0;list-style:none;}
+  ul.pts li{position:relative;padding:7px 0 7px 20px;font-size:14.5px;border-bottom:1px dashed var(--line);}
+  ul.pts li:last-child{border-bottom:none;}
+  ul.pts li::before{content:"—";position:absolute;left:0;color:var(--accent2);font-weight:700;}
+  ul.pts b{color:var(--brand);}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 4px;}
+  table.tbl th{background:var(--brand);color:#fff;text-align:left;padding:8px 10px;font-weight:600;}
+  table.tbl th.num{text-align:right;}
+  table.tbl td{padding:7px 10px;border-bottom:1px solid var(--line);}
+  table.tbl tr:nth-child(even) td{background:#f7f9fc;}
+  table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  table.tbl td.neg{color:var(--bear);}
+  .tbl-wrap{overflow-x:auto;}
+  .chart-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px 22px 14px;margin:14px 0;}
+  .chart-card .ct{font-size:13px;font-weight:700;color:var(--brand);margin-bottom:12px;}
+  .chart-src{font-size:10.5px;color:#9aa3b2;margin-top:8px;}
+  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:11px;height:11px;border-radius:2px;display:inline-block;}
+  .callout{background:#fbf6ec;border:1px solid #e8dcc3;border-radius:8px;padding:14px 18px;font-size:13px;color:var(--ink-soft);margin-top:14px;}
+  .callout .t{font-size:10.5px;font-weight:700;letter-spacing:0.6px;color:var(--warn);text-transform:uppercase;display:block;margin-bottom:5px;}
+  .risk-box{background:var(--brand);color:#dde6f3;border-radius:8px;padding:22px 24px;margin-top:14px;}
+  .risk-box h4{margin:0 0 10px;color:#fff;font-size:14.5px;}
+  .risk-box ul{margin:0;padding-left:18px;}
+  .risk-box li{margin-bottom:8px;font-size:13px;}
+  .risk-box li b{color:#fff;}
+  footer{border-top:1px solid var(--line);margin-top:50px;padding-top:20px;font-size:11px;color:#9aa3b2;line-height:1.6;}
+  @media(max-width:560px){.intro h1{font-size:21px;}.report-head h2{font-size:19px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="intro">
+    <div class="eyebrow">9 September 2026</div>
+    <h1>Nebius Group (NBIS): Communacopia + Technology 2026 컨퍼런스 핵심 포인트</h1>
+  </div>
+
+  <section class="report" id="rpt1">
+    <div class="report-head">
+      <div class="tag">European Semiconductors, Hardware and Gaming Tech · Netherlands</div>
+      <h2>Nebius — 2028년까지 확장된 수요 가시성, Palantir 파트너십, 개선되는 계약 경제성</h2>
+      <p class="lede">AI 인프라 수요가 여전히 공급을 앞서는 가운데, 1~3년 Core 계약 중심의 바벨형 계약 믹스와 선수금 기반 Capex 조달로 payback 단축·마진 개선·파이낸싱 유연성이 동시에 강화되고 있다.</p>
+    </div>
+
+    <div class="report-body">
+      <div class="chips">
+        <div class="chip"><div class="k">Rating</div><div class="v buy">Buy</div><div class="s">유지</div></div>
+        <div class="chip"><div class="k">12m Target Price</div><div class="v">$328</div><div class="s">7x 2HCY27+1HCY28E EV/Sales</div></div>
+        <div class="chip"><div class="k">Price (8 Sep 2026)</div><div class="v">$243.88</div><div class="s">Upside +34.5%</div></div>
+        <div class="chip"><div class="k">Market Cap / EV</div><div class="v">$68.4bn</div><div class="s">EV $85.2bn (리스 포함)</div></div>
+        <div class="chip"><div class="k">3m ADTV</div><div class="v">$4.7bn</div><div class="s">M&amp;A Rank 3</div></div>
+      </div>
+
+      <div class="callout"><span class="t">세션 개요</span>Arkady Volozh(창업자 겸 CEO)와 Marc Boroditsky(CRO)가 참석한 fireside chat. 핵심은 (1) 2028년까지 이어지는 수요 가시성과 다변화된 고객 기반, (2) Palantir 파트너십을 통한 엔터프라이즈 유통 강화, (3) 계획대로 진행 중인 캐파 확장과 업계 전반의 규제 리스크가 오히려 마진에 우호적일 가능성, (4) 개선되는 계약 경제성의 네 가지.</div>
+
+      <h3 class="sec"><span class="n">1</span>수요 가시성 2028년까지 확장 — 계약 기간별로 다변화된 고객 기반</h3>
+      <ul class="pts">
+        <li>경영진은 고객 파이프라인 성장을 근거로 <b>수요가 여전히 공급을 초과</b>하고 있다고 강조</li>
+        <li>선행 수요 가시성은 약 <b>18~24개월</b>이며, 고객 협의의 무게중심이 점차 <b>2028년 캐파</b>로 이동 중</li>
+        <li>회사는 <b>2027년 계획 캐파를 지금 당장 완판할 수 있다</b>고 재확인했으나, 타이트한 2027년 시장에서 전략 고객을 위한 여유분을 남겨두는 방침 — 수요·가격 트렌드에 대한 자신감을 시사</li>
+        <li>계약 믹스는 <b>바벨(barbell) 전략</b>: AI 네이티브·엔터프라이즈 대상 <b>1~3년 중기 계약</b>이 핵심이자 가장 빠르게 성장하는 세그먼트</li>
+        <li>여기에 <b>MSFT·META 등 저위험 고객과의 장기 계약</b>, 그리고 <b>단기 surge 계약</b>(2Q26 실적에서 공개된 대로 현저히 높은 가격)이 기회적으로 보완</li>
+      </ul>
+
+      <h3 class="sec"><span class="n">2</span>Palantir 파트너십 — 엔터프라이즈 유통 채널 확보 및 풀스택 플랫폼 전략 강화</h3>
+      <ul class="pts">
+        <li>Palantir 딜은 단순 인프라 공급이 아니라 <b>Nebius 전체 오퍼링 스위트에 대한 엔터프라이즈 수요 접근권</b>을 제공</li>
+        <li>Palantir가 Nebius 제품의 <b>깊은 엔터프라이즈 유통 채널</b> 역할을 하고, Nebius의 <b>token factory</b>는 open-weight 모델 구동에 활용 가능</li>
+        <li>엔터프라이즈가 자체 데이터로 모델을 fine-tune → <b>비용 절감, 도메인 내 성능 강화, 데이터 소유권 확대</b></li>
+        <li>전통적 인프라 계약 대비 <b>더 깊은 고객 관계, 높은 전환비용(switching cost), 더 긴 계약 기간</b>을 유도하는 동시에 Nebius의 캐파 배치 확대를 뒷받침</li>
+      </ul>
+
+      <h3 class="sec"><span class="n">3</span>캐파 확장 순항 — 규제 복잡성은 업계 공통 공급 제약, 마진에는 우호적일 수 있음</h3>
+      <ul class="pts">
+        <li>기존에 제시한 <b>캐파 램프업 일정을 유지</b>하며, <b>Vineland(NJ) 사이트는 우호적인 zoning 결정</b>을 확보</li>
+        <li>인허가(permitting) 소요 기간은 이미 배치 스케줄에 반영되어 있어 추가 장애 발생 시에도 유연성 확보</li>
+        <li>규제 이슈는 Nebius 고유가 아닌 <b>업계 전반의 문제</b>이며, 규제 역풍은 공급 제약을 심화시켜 <b>가격·마진 상승</b>으로 이어질 수 있다는 것이 리포트의 시각</li>
+        <li>Nebius는 <b>지역 다변화, 실행 버퍼, 선제적 지역사회 소통</b> 측면에서 상대적으로 유리한 위치</li>
+        <li><b>Bloom Energy</b> 파트너십으로 저탄소 전력을 확보 → 프로젝트 경제성, 지역사회 수용성, 향후 사이트 개발에 긍정적</li>
+      </ul>
+
+      <h3 class="sec"><span class="n">4</span>계약 경제성 개선 — payback 단축, 마진, 파이낸싱 유연성</h3>
+      <ul class="pts">
+        <li><b>Core 1~3년 계약</b>이 선호 세그먼트로, <b>장기 하이퍼스케일러 딜 대비 현저히 높은 가격</b>에 <b>선수금(prepayment)</b>이 뒷받침</li>
+        <li>회사는 고객별 캐파 배분에 있어 <b>점점 더 선별적</b>이며, 유리한 계약 조건에 우선순위</li>
+        <li>최근 계약들은 <b>현저히 짧아진 payback 기간</b>을 뒷받침(2Q26 실적 코멘터리 기준)하며, <b>선수금이 Capex의 의미 있는 비중을 조달</b></li>
+        <li><b>GPU 가치 상승, payback 단축, 수익성 개선</b>이 맞물려 debt 및 asset-backed 솔루션 등 <b>매력적인 파이낸싱 기회</b>가 확대</li>
+      </ul>
+
+      <h3 class="sec"><span class="n">5</span>연간 실적 추정</h3>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>항목</th><th class="num">12/25</th><th class="num">12/26E</th><th class="num">12/27E</th><th class="num">12/28E</th></tr></thead>
+        <tbody>
+          <tr><td><b>Revenue ($mn)</b></td><td class="num">529.8</td><td class="num">3,585.3</td><td class="num">13,919.4</td><td class="num">24,957.5</td></tr>
+          <tr><td><b>EBIT ($mn)</b></td><td class="num neg">(596.3)</td><td class="num neg">(3,547.7)</td><td class="num neg">(1,488.8)</td><td class="num">4,529.8</td></tr>
+          <tr><td><b>EPS ($)</b></td><td class="num">0.41</td><td class="num neg">(11.01)</td><td class="num neg">(10.29)</td><td class="num">7.92</td></tr>
+          <tr><td><b>EV/Sales (x)</b></td><td class="num">30.4</td><td class="num">23.8</td><td class="num">7.4</td><td class="num">4.0</td></tr>
+          <tr><td><b>EV/EBITDA (x)</b></td><td class="num">NM</td><td class="num">49.7</td><td class="num">10.2</td><td class="num">5.3</td></tr>
+          <tr><td><b>P/E (x)</b></td><td class="num">146.7</td><td class="num">NM</td><td class="num">NM</td><td class="num">30.8</td></tr>
+          <tr><td><b>FCF yield (%)</b></td><td class="num neg">(24.9)</td><td class="num neg">(26.9)</td><td class="num neg">(34.4)</td><td class="num">3.9</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="tbl-wrap" style="margin-top:14px;">
+      <table class="tbl">
+        <thead><tr><th>분기 EPS ($)</th><th class="num">6/26</th><th class="num">9/26E</th><th class="num">12/26E</th><th class="num">3/27E</th></tr></thead>
+        <tbody>
+          <tr><td><b>EPS</b></td><td class="num neg">(0.68)</td><td class="num neg">(5.88)</td><td class="num neg">(6.66)</td><td class="num neg">(2.10)</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="chart-src">Source: Company data, FactSet</div>
+
+      <div class="chart-card">
+        <div class="ct">Revenue vs EBIT 추정 ($mn)</div>
+        <div class="legend">
+          <span><i style="background:var(--brand)"></i>Revenue</span>
+          <span><i style="background:var(--accent)"></i>EBIT</span>
+        </div>
+        <svg viewBox="0 0 880 320" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#e3e8f0" stroke-width="1">
+            <line x1="70" y1="30" x2="850" y2="30"/>
+            <line x1="70" y1="71.7" x2="850" y2="71.7"/>
+            <line x1="70" y1="113.3" x2="850" y2="113.3"/>
+            <line x1="70" y1="155" x2="850" y2="155"/>
+            <line x1="70" y1="196.7" x2="850" y2="196.7"/>
+            <line x1="70" y1="280" x2="850" y2="280"/>
+          </g>
+          <line x1="70" y1="238.3" x2="850" y2="238.3" stroke="#8a94a6" stroke-width="1.2"/>
+          <g font-size="11" fill="#7b8494" text-anchor="end">
+            <text x="62" y="34">25,000</text>
+            <text x="62" y="75.7">20,000</text>
+            <text x="62" y="117.3">15,000</text>
+            <text x="62" y="159">10,000</text>
+            <text x="62" y="200.7">5,000</text>
+            <text x="62" y="242.3">0</text>
+            <text x="62" y="284">-5,000</text>
+          </g>
+          <!-- Revenue bars -->
+          <rect x="112.5" y="233.9" width="50" height="4.4" fill="#1a2b4a"/>
+          <rect x="307.5" y="208.4" width="50" height="29.9" fill="#1a2b4a"/>
+          <rect x="502.5" y="122.3" width="50" height="116" fill="#1a2b4a"/>
+          <rect x="697.5" y="30.3" width="50" height="208" fill="#1a2b4a"/>
+          <!-- EBIT bars -->
+          <rect x="172.5" y="238.3" width="50" height="5" fill="#6b8cae"/>
+          <rect x="367.5" y="238.3" width="50" height="29.6" fill="#6b8cae"/>
+          <rect x="562.5" y="238.3" width="50" height="12.4" fill="#6b8cae"/>
+          <rect x="757.5" y="200.6" width="50" height="37.7" fill="#6b8cae"/>
+          <g font-size="11" fill="#1a2b4a" text-anchor="middle" font-weight="700">
+            <text x="137.5" y="229">530</text>
+            <text x="332.5" y="203">3,585</text>
+            <text x="527.5" y="117">13,919</text>
+            <text x="722.5" y="25">24,958</text>
+          </g>
+          <g font-size="11" fill="#3d5a80" text-anchor="middle" font-weight="700">
+            <text x="197.5" y="256">-596</text>
+            <text x="392.5" y="281">-3,548</text>
+            <text x="587.5" y="264">-1,489</text>
+            <text x="782.5" y="195">4,530</text>
+          </g>
+          <g font-size="12" fill="#525866" text-anchor="middle">
+            <text x="167.5" y="305">12/25</text>
+            <text x="362.5" y="305">12/26E</text>
+            <text x="557.5" y="305">12/27E</text>
+            <text x="752.5" y="305">12/28E</text>
+          </g>
+        </svg>
+        <div class="chart-src">Source: Company data, FactSet</div>
+      </div>
+
+      <h3 class="sec"><span class="n">6</span>목표가 및 주가 추이</h3>
+      <div class="chart-card">
+        <div class="ct">목표가 변경 이력 vs 종가 ($)</div>
+        <div class="legend">
+          <span><i style="background:var(--brand)"></i>Target Price</span>
+          <span><i style="background:var(--accent)"></i>Closing Price</span>
+        </div>
+        <svg viewBox="0 0 880 320" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#e3e8f0" stroke-width="1">
+            <line x1="70" y1="30" x2="850" y2="30"/>
+            <line x1="70" y1="65.7" x2="850" y2="65.7"/>
+            <line x1="70" y1="101.4" x2="850" y2="101.4"/>
+            <line x1="70" y1="137.1" x2="850" y2="137.1"/>
+            <line x1="70" y1="172.9" x2="850" y2="172.9"/>
+            <line x1="70" y1="208.6" x2="850" y2="208.6"/>
+            <line x1="70" y1="244.3" x2="850" y2="244.3"/>
+          </g>
+          <line x1="70" y1="280" x2="850" y2="280" stroke="#8a94a6" stroke-width="1.2"/>
+          <g font-size="11" fill="#7b8494" text-anchor="end">
+            <text x="62" y="34">350</text>
+            <text x="62" y="69.7">300</text>
+            <text x="62" y="105.4">250</text>
+            <text x="62" y="141.1">200</text>
+            <text x="62" y="176.9">150</text>
+            <text x="62" y="212.6">100</text>
+            <text x="62" y="248.3">50</text>
+            <text x="62" y="284">0</text>
+          </g>
+          <polyline fill="none" stroke="#6b8cae" stroke-width="2" points="70,248.4 119.2,230.9 194.9,212.8 234.6,192.9 304.6,220.3 480.5,210 588.4,169.6 649,123 698.1,128.8 734.1,93.5 840,129.4"/>
+          <polyline fill="none" stroke="#1a2b4a" stroke-width="2.5" points="70,231.4 119.2,225 194.9,194.3 234.6,182.1 304.6,169.3 480.5,165.7 588.4,133.6 649,112.9 698.1,89.3 734.1,75.7 840,45.7"/>
+          <g fill="#1a2b4a">
+            <circle cx="70" cy="231.4" r="3.5"/><circle cx="119.2" cy="225" r="3.5"/><circle cx="194.9" cy="194.3" r="3.5"/><circle cx="234.6" cy="182.1" r="3.5"/><circle cx="304.6" cy="169.3" r="3.5"/><circle cx="480.5" cy="165.7" r="3.5"/><circle cx="588.4" cy="133.6" r="3.5"/><circle cx="649" cy="112.9" r="3.5"/><circle cx="698.1" cy="89.3" r="3.5"/><circle cx="734.1" cy="75.7" r="3.5"/><circle cx="840" cy="45.7" r="3.5"/>
+          </g>
+          <g font-size="10.5" fill="#1a2b4a" font-weight="700" text-anchor="middle">
+            <text x="70" y="222">68</text>
+            <text x="194.9" y="185">120</text>
+            <text x="304.6" y="160">155</text>
+            <text x="480.5" y="156">160</text>
+            <text x="588.4" y="124">205</text>
+            <text x="649" y="103">234</text>
+            <text x="698.1" y="80">267</text>
+            <text x="734.1" y="66">286</text>
+            <text x="840" y="36">328</text>
+          </g>
+          <g font-size="11" fill="#525866" text-anchor="middle">
+            <text x="70" y="300">Jul-25</text>
+            <text x="234.6" y="300">Oct-25</text>
+            <text x="480.5" y="300">Feb-26</text>
+            <text x="649" y="300">May-26</text>
+            <text x="840" y="300">Aug-26</text>
+          </g>
+        </svg>
+        <div class="chart-src">Source: FactSet</div>
+      </div>
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th>리포트 일자</th><th class="num">목표가 ($)</th><th class="num">종가 ($)</th></tr></thead>
+        <tbody>
+          <tr><td>24-Aug-26</td><td class="num">328.00</td><td class="num">210.91</td></tr>
+          <tr><td>29-Jun-26</td><td class="num">286.00</td><td class="num">261.15</td></tr>
+          <tr><td>10-Jun-26</td><td class="num">267.00</td><td class="num">211.69</td></tr>
+          <tr><td>15-May-26</td><td class="num">234.00</td><td class="num">219.94</td></tr>
+          <tr><td>13-Apr-26</td><td class="num">205.00</td><td class="num">154.56</td></tr>
+          <tr><td>15-Feb-26</td><td class="num">160.00</td><td class="num">98.01</td></tr>
+          <tr><td>14-Nov-25</td><td class="num">155.00</td><td class="num">83.54</td></tr>
+          <tr><td>08-Oct-25</td><td class="num">137.00</td><td class="num">122.00</td></tr>
+          <tr><td>17-Sep-25</td><td class="num">120.00</td><td class="num">94.08</td></tr>
+          <tr><td>08-Aug-25</td><td class="num">77.00</td><td class="num">68.78</td></tr>
+          <tr><td>13-Jul-25</td><td class="num">68.00</td><td class="num">44.30</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout"><span class="t">주목</span>커버리지 개시(2025년 7월, TP $68) 이후 약 14개월간 목표가가 11차례 연속 상향되어 $328에 도달. 목표가는 7x 2HCY27+1HCY28E EV/Sales 배수 기준.</div>
+
+      <h3 class="sec"><span class="n">!</span>리스크 &amp; 모니터링 포인트</h3>
+      <div class="risk-box">
+        <h4>Key Risks to Rating &amp; Price Target</h4>
+        <ul>
+          <li><b>하이퍼스케일러의 경쟁 압력:</b> 대형 클라우드 사업자의 캐파 확대·가격 경쟁이 Nebius의 가격 결정력과 고객 확보에 부담</li>
+          <li><b>AI 도입 속도 둔화:</b> 예상보다 느린 AI adoption은 2027~2028년 캐파에 대한 수요 가시성을 약화</li>
+          <li><b>단기 계약 비중 확대에 따른 가시성 저하:</b> surge 계약 등 단기 딜은 가격은 높지만 매출 예측 가능성을 낮춤</li>
+        </ul>
+        <h4 style="margin-top:14px;">모니터링 포인트</h4>
+        <ul>
+          <li>2027년 캐파 판매 진행률 및 전략 고객용 여유분 배분 방식 — 2028년 캐파 협의 전환 속도</li>
+          <li>Core 1~3년 계약의 가격 프리미엄 유지 여부와 선수금이 Capex에서 차지하는 비중 추이</li>
+          <li>Vineland(NJ) 등 신규 사이트의 인허가·zoning 진행 상황과 램프업 일정 준수 여부</li>
+          <li>Palantir 채널을 통한 엔터프라이즈 고객 확보 실적 및 token factory 활용도</li>
+          <li>debt·asset-backed 파이낸싱 조달 조건 — GPU 담보가치 및 payback 기간 변화</li>
+          <li>FCF yield 전환 시점(12/28E +3.9%) — 2026~27년 대규모 마이너스 FCF 구간의 자금 조달 안정성</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div>본 문서는 투자 권유를 목적으로 하지 않습니다.</div>
+  </footer>
+
+</div>
+</body>
+</html>
